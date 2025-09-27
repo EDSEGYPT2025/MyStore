@@ -1,0 +1,179 @@
+﻿@page
+@model MyStore.Pages.IndexModel
+@{
+    ViewData["Title"] = "المتجر";
+}
+
+<div class="store-container">
+
+    <!-- Section: Header and Search -->
+    <header class="store-header text-center">
+        <h1>متجرنا الإلكتروني</h1>
+        <p class="lead text-muted">تصفح أحدث المنتجات من أفضل الشركات</p>
+        <div class="search-bar-container mx-auto mt-4">
+            <input type="search" id="product-search-input" class="form-control form-control-lg" placeholder="ابحث عن منتج...">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+    </header>
+
+    <!-- Section: Main Content (Store Layout) -->
+    <div class="row mt-5">
+        <!-- Main Area: Companies and Products -->
+        <div class="col-lg-9">
+            <!-- Companies List -->
+            <section id="companies-section" class="mb-5">
+                <h3 class="section-title">اختر شركة</h3>
+                <div id="companies-list" class="d-flex flex-wrap gap-3">
+                    @foreach (var company in Model.Companies)
+                    {
+                        <button class="company-card-btn" data-company-id="@company.Id">
+                            <img src="@(company.LogoUrl ?? "/images/placeholder.png")" alt="@company.Name" class="company-logo">
+                            <span class="company-name">@company.Name</span>
+                        </button>
+                    }
+                </div>
+            </section>
+
+            <!-- Products List -->
+            <section id="products-section">
+                <h3 class="section-title">المنتجات</h3>
+                <!-- The placeholder is now visible by default -->
+                <div id="products-placeholder" class="text-center placeholder-box">
+                    <i class="fas fa-arrow-up fa-2x mb-3"></i>
+                    <p>الرجاء اختيار شركة من الأعلى لعرض منتجاتها</p>
+                </div>
+                <div id="loading-spinner" class="text-center placeholder-box d-none">
+                    <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+                </div>
+                <div id="products-list" class="row gx-1 gy-3">
+                    <!-- Products will be loaded here by JavaScript after selecting a company -->
+                </div>
+            </section>
+        </div>
+
+        <!-- === DESKTOP ONLY: Shopping Cart Sidebar === -->
+        <div class="col-lg-3 d-none d-lg-block">
+            <aside id="cart-sidebar" class="sticky-top">
+                <div class="cart-header"><h5><i class="fas fa-shopping-cart me-2"></i>سلة المشتريات</h5></div>
+                <div class="cart-body">
+                    <div id="cart-items"></div>
+                    <p class="cart-empty-msg text-center text-muted">سلتك فارغة حالياً.</p>
+                </div>
+                <div class="cart-footer">
+                    <div class="d-flex justify-content-between align-items-center"><strong>الإجمالي</strong><strong><span id="cart-total">0.00</span> جنيه</strong></div>
+                    <div class="d-grid mt-3"><button id="checkout-btn" class="btn btn-success btn-lg" disabled><i class="fab fa-whatsapp me-2"></i>إتمام الطلب</button></div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+<!-- === MOBILE ONLY: Floating Cart Button === -->
+<button id="mobile-cart-btn" class="btn btn-primary d-lg-none" data-bs-toggle="modal" data-bs-target="#cartModal">
+    <i class="fas fa-shopping-cart"></i>
+    <span id="mobile-cart-count" class="badge bg-danger rounded-pill">0</span>
+</button>
+
+<!-- Footer Section -->
+<footer class="store-footer mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4 mb-lg-0">
+                <h5 class="footer-title">متجرنا</h5>
+                <p class="text-muted">نقدم أفضل المنتجات من أفضل الشركات العالمية. تسوق بثقة وسهولة.</p>
+            </div>
+            <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
+                <h5 class="footer-title">روابط سريعة</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="footer-link">الصفحة الرئيسية</a></li>
+                    <li><a href="#" class="footer-link">العروض</a></li>
+                    <li><a href="#" class="footer-link">اتصل بنا</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                <h5 class="footer-title">تواصل معنا</h5>
+                <ul class="list-unstyled">
+                    <li class="d-flex align-items-center mb-2"><i class="fas fa-phone me-2"></i> <span dir="ltr">+20 101 234 5678</span></li>
+                    <li class="d-flex align-items-center"><i class="fas fa-envelope me-2"></i> support@mystore.com</li>
+                </ul>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                <h5 class="footer-title">تابعنا</h5>
+                <div class="social-icons">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="text-center pt-4 mt-4 border-top">
+            <p class="mb-0 text-muted">&copy; @DateTime.Now.Year - MyStore. جميع الحقوق محفوظة.</p>
+        </div>
+    </div>
+</footer>
+
+
+<!-- === MODALS === -->
+<!-- Modal for Mobile Cart -->
+<div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" id="mobile-cart-content">
+            <!-- Mobile cart content is generated by JS -->
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal for Checkout (Used by both Desktop and Mobile) -->
+<div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="checkoutModalLabel">بيانات التوصيل</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="checkout-form" novalidate>
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3"><label for="customer-name" class="form-label">الاسم الكامل</label><input type="text" class="form-control" id="customer-name" required></div>
+                    <div class="mb-3"><label for="customer-phone" class="form-label">رقم الهاتف</label><input type="tel" class="form-control" id="customer-phone" required></div>
+                    <div class="mb-3"><label for="customer-address" class="form-label">العنوان بالتفصيل</label><textarea class="form-control" id="customer-address" rows="3" required></textarea></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" id="confirm-order-btn" class="btn btn-primary">تأكيد الطلب عبر واتساب</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Product Details -->
+<div class="modal fade" id="productDetailsModal" tabindex="-1" aria-labelledby="productDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="productDetailsModalLabel">تفاصيل المنتج</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <div class="row">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <img src="" class="img-fluid rounded modal-product-image" alt="Product Image">
+                    </div>
+                    <div class="col-md-6 d-flex flex-column">
+                        <h3 class="modal-product-title mb-2">اسم المنتج</h3>
+                        <p class="text-muted flex-grow-1 modal-product-description">وصف المنتج هنا...</p>
+                        <div class="mt-auto">
+                            <h4 class="modal-product-price fw-bold mb-3">0.00 جنيه</h4>
+                            <button class="btn btn-primary btn-lg w-100 modal-add-to-cart-btn" data-product-id="">
+                                <i class="fas fa-cart-plus me-1"></i> إضافة للسلة
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

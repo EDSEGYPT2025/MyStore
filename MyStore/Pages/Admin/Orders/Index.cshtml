@@ -1,0 +1,138 @@
+﻿@page
+@model MyStore.Pages.Admin.Orders.IndexModel
+@using System.Text.Json
+@using System.Text.Json.Serialization
+
+@functions {
+    // Helper class to deserialize product details from JSON string.
+    // This is now simplified as the backend consistently saves with "UnitPrice".
+    public class CartItemDto
+    {
+        public string ProductName { get; set; }
+        public int Quantity { get; set; }
+        public decimal UnitPrice { get; set; }
+    }
+}
+
+@{
+    ViewData["Title"] = "إدارة الطلبات";
+}
+
+<h1 class="mb-4">إدارة الطلبات</h1>
+<p class="text-muted">هنا يمكنك عرض جميع الطلبات التي تم إنشاؤها من قبل العملاء.</p>
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <i class="fas fa-list-alt me-2"></i>قائمة الطلبات
+    </div>
+    <div class="card-body">
+        @if (Model.Orders.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>رقم الطلب</th>
+                            <th>تاريخ الطلب</th>
+                            <th>اسم العميل</th>
+                            <th>رقم الهاتف</th>
+                            <th>الإجمالي</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Orders)
+                        {
+                            <tr>
+                                <td><strong>@item.OrderNumber</strong></td>
+                                <td>@item.OrderDate.ToLocalTime().ToString("yyyy/MM/dd hh:mm tt")</td>
+                                <td>@item.CustomerName</td>
+                                <td>@item.CustomerPhone</td>
+                                <td>@item.TotalAmount.ToString("N2") جنيه</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderDetailsModal-@item.Id">
+                                        <i class="fas fa-eye me-1"></i> عرض التفاصيل
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center p-4">
+                <p class="mb-0">لا توجد أي طلبات لعرضها حالياً.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modals for Order Details -->
+@foreach (var item in Model.Orders)
+{
+    <div class="modal fade" id="orderDetailsModal-@item.Id" tabindex="-1" aria-labelledby="orderDetailsModalLabel-@item.Id" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderDetailsModalLabel-@item.Id">تفاصيل الطلب: @item.OrderNumber</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>معلومات العميل</h6>
+                    <p><strong>الاسم:</strong> @item.CustomerName</p>
+                    <p><strong>الهاتف:</strong> @item.CustomerPhone</p>
+                    <p><strong>العنوان:</strong> @item.CustomerAddress</p>
+                    <hr>
+                    <h6>المنتجات المطلوبة</h6>
+                    @{
+                        var cartItems = new List<CartItemDto>();
+                        try
+                        {
+                            if (!string.IsNullOrEmpty(item.OrderDetails))
+                            {
+                                // === CRITICAL FIX: Use JsonSerializerOptions to ignore case sensitivity ===
+                                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                                cartItems = JsonSerializer.Deserialize<List<CartItemDto>>(item.OrderDetails, options);
+                            }
+                        }
+                        catch
+                        {
+                            // In case of error, show a message
+                            <p class="text-danger">حدث خطأ أثناء عرض تفاصيل المنتجات.</p>
+                        }
+                    }
+                    @if (cartItems != null && cartItems.Any())
+                    {
+                        <table class="table table-bordered">
+                            <thead class="table-sm">
+                                <tr>
+                                    <th>المنتج</th>
+                                    <th>الكمية</th>
+                                    <th>سعر الوحدة</th>
+                                    <th>الإجمالي الفرعي</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var product in cartItems)
+                                {
+                                    <tr>
+                                        <td>@product.ProductName</td>
+                                        <td>@product.Quantity</td>
+                                        <td>@product.UnitPrice.ToString("N2") جنيه</td>
+                                        <td>@((product.Quantity * product.UnitPrice).ToString("N2")) جنيه</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
