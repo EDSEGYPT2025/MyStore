@@ -15,6 +15,7 @@ namespace MyStore.Pages
         public string CustomerPhone { get; set; }
         public string CustomerAddress { get; set; }
         public List<IncomingCartItemDto> CartItems { get; set; } = new();
+        public int StoreId { get; set; } // <<<< تم إضافة حقل معرّف المتجر
     }
 
     public class IncomingCartItemDto
@@ -41,68 +42,87 @@ namespace MyStore.Pages
             _context = context;
         }
 
-        // Properties to hold data for the Razor page
+        // --- خصائص جديدة لعرض بيانات المتجر الحالي ---
+        public Store CurrentStore { get; set; }
         public List<Company> Companies { get; set; } = new();
+        public List<Product> Products { get; set; } = new();
 
-        // === FIX: Added the missing FeaturedProducts property ===
-        public List<Product> FeaturedProducts { get; set; } = new();
-
-        public async Task OnGetAsync()
+        // --- الدالة الرئيسية لتحميل الصفحة ---
+        public async Task<IActionResult> OnGetAsync(string storeSlug)
         {
-            Companies = await _context.Companies.ToListAsync();
+            if (string.IsNullOrEmpty(storeSlug))
+            {
+                // في حالة عدم تحديد متجر، يتم عرض صفحة خطأ
+                return NotFound("الرجاء تحديد رابط متجر صالح.");
+            }
 
-            // === FIX: Populate the FeaturedProducts list ===
-            // This will fetch the first 6 products to display on the main page.
-            FeaturedProducts = await _context.Products
-                .OrderBy(p => p.Id)
-                .Take(6)
-                .ToListAsync();
+            // 1. البحث عن المتجر باستخدام الـ Slug من الرابط
+            CurrentStore = await _context.Stores.FirstOrDefaultAsync(s => s.Slug == storeSlug);
+
+            // 2. إذا لم يتم العثور على المتجر، يتم عرض خطأ 404
+            if (CurrentStore == null)
+            {
+                return NotFound("هذا المتجر غير موجود.");
+            }
+
+            // 3. تحميل الماركات (Companies) التي لديها منتجات "في هذا المتجر فقط"
+            Companies = await _context.Products
+                                      .Where(p => p.StoreId == CurrentStore.Id)
+                                      .Select(p => p.Company) // اختر الماركة المرتبطة بالمنتج
+                                      .Distinct() // احصل على الماركات الفريدة فقط
+                                      .OrderBy(c => c.Name)
+                                      .ToListAsync();
+
+            // 4. تحميل جميع منتجات هذا المتجر ليتم عرضها
+            Products = await _context.Products
+                                     .Where(p => p.StoreId == CurrentStore.Id)
+                                     .Include(p => p.Company) // قم بتضمين بيانات الماركة مع المنتج
+                                     .ToListAsync();
+
+            return Page();
         }
 
-        public async Task<JsonResult> OnGetProductsAsync(int companyId)
-        {
-            var products = await _context.Products
-                .Where(p => p.CompanyId == companyId)
-                .Select(p => new { p.Id, p.Name, p.Price, p.ImageUrl, p.Description })
-                .ToListAsync();
-            return new JsonResult(products);
-        }
-
+        // --- دالة إنشاء الطلب المحدثة ---
         [ValidateAntiForgeryToken]
         public async Task<JsonResult> OnPostCreateOrderAsync([FromBody] OrderDto orderData)
         {
-            // Validation and order creation logic...
-            if (orderData == null || orderData.CartItems == null || !orderData.CartItems.Any())
+            if (orderData == null || orderData.StoreId <= 0 || orderData.CartItems == null || !orderData.CartItems.Any())
             {
-                return new JsonResult(new { success = false, message = "سلة المشتريات فارغة." });
+                return new JsonResult(new { success = false, message = "بيانات الطلب غير صالحة أو سلة المشتريات فارغة." });
             }
-            if (string.IsNullOrWhiteSpace(orderData.CustomerName) ||
-                string.IsNullOrWhiteSpace(orderData.CustomerPhone) ||
-                string.IsNullOrWhiteSpace(orderData.CustomerAddress))
+
+            var storeExists = await _context.Stores.AnyAsync(s => s.Id == orderData.StoreId);
+            if (!storeExists)
             {
-                return new JsonResult(new { success = false, message = "الرجاء التأكد من إدخال جميع بيانات التوصيل." });
+                return new JsonResult(new { success = false, message = "المتجر المحدد غير موجود." });
             }
+
             try
             {
-                var groupedCartItems = orderData.CartItems.GroupBy(item => item.Id).Select(g => new { ProductId = g.Key, Quantity = g.Sum(i => i.Quantity) }).ToList();
-                var productIds = groupedCartItems.Select(item => item.ProductId).ToList();
-                var productsFromDb = await _context.Products.Where(p => productIds.Contains(p.Id)).ToListAsync();
+                var productIds = orderData.CartItems.Select(item => item.Id).ToList();
+                // تأمين إضافي: تأكد من أن المنتجات المطلوبة تتبع للمتجر الصحيح
+                var productsFromDb = await _context.Products
+                    .Where(p => productIds.Contains(p.Id) && p.StoreId == orderData.StoreId)
+                    .ToListAsync();
+
                 decimal total = 0;
                 var itemsToSave = new List<SavedCartItemDto>();
-                foreach (var cartItem in groupedCartItems)
+
+                foreach (var cartItem in orderData.CartItems)
                 {
-                    var productFromDb = productsFromDb.FirstOrDefault(p => p.Id == cartItem.ProductId);
-                    if (productFromDb != null)
+                    var productFromDb = productsFromDb.FirstOrDefault(p => p.Id == cartItem.Id);
+                    if (productFromDb != null && cartItem.Quantity > 0)
                     {
-                        if (cartItem.Quantity <= 0) continue;
                         itemsToSave.Add(new SavedCartItemDto { ProductName = productFromDb.Name, Quantity = cartItem.Quantity, UnitPrice = productFromDb.Price });
                         total += cartItem.Quantity * productFromDb.Price;
                     }
                 }
+
                 if (!itemsToSave.Any())
                 {
                     return new JsonResult(new { success = false, message = "لم يتم العثور على منتجات صالحة في الطلب." });
                 }
+
                 var newOrder = new Order
                 {
                     OrderNumber = $"ORD-{DateTime.UtcNow.Ticks}",
@@ -110,18 +130,20 @@ namespace MyStore.Pages
                     CustomerPhone = orderData.CustomerPhone,
                     CustomerAddress = orderData.CustomerAddress,
                     TotalAmount = total,
-                    OrderDetails = JsonSerializer.Serialize(itemsToSave),
-                    OrderDate = DateTime.UtcNow
+                    OrderDetailsJson = JsonSerializer.Serialize(itemsToSave),
+                    OrderDate = DateTime.UtcNow,
+                    StoreId = orderData.StoreId // <<<< الأهم: ربط الطلب بالمتجر الصحيح
                 };
+
                 _context.Orders.Add(newOrder);
                 await _context.SaveChangesAsync();
                 return new JsonResult(new { success = true, orderNumber = newOrder.OrderNumber });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return new JsonResult(new { success = false, message = $"خطأ داخلي: {ex.Message}" });
+                // يفضل تسجيل الخطأ هنا
+                return new JsonResult(new { success = false, message = "حدث خطأ غير متوقع أثناء معالجة الطلب." });
             }
         }
     }
 }
-

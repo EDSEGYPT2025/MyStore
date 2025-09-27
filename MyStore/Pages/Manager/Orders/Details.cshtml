@@ -1,0 +1,85 @@
+﻿@page "{id:int}"
+@model MyStore.Pages.Manager.Orders.DetailsModel
+@{
+    ViewData["Title"] = $"تفاصيل الطلب - {Model.Order.OrderNumber}";
+    Layout = "~/Pages/Shared/_ManagerLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">@ViewData["Title"]</h1>
+    <a asp-page="./Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-right me-2"></i>العودة لقائمة الطلبات
+    </a>
+</div>
+
+<div class="row">
+    <!-- Customer and Order Info -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">بيانات العميل</h5>
+            </div>
+            <div class="card-body">
+                <dl>
+                    <dt>اسم العميل</dt>
+                    <dd>@Model.Order.CustomerName</dd>
+
+                    <dt>رقم الهاتف</dt>
+                    <dd>@Model.Order.CustomerPhone</dd>
+
+                    <dt>العنوان</dt>
+                    <dd>@Model.Order.CustomerAddress</dd>
+                </dl>
+            </div>
+        </div>
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0">ملخص الطلب</h5>
+            </div>
+            <div class="card-body">
+                <dl>
+                    <dt>رقم الطلب</dt>
+                    <dd>@Model.Order.OrderNumber</dd>
+
+                    <dt>تاريخ الطلب</dt>
+                    <dd>@Model.Order.OrderDate.ToString("f")</dd>
+
+                    <dt>المبلغ الإجمالي</dt>
+                    <dd class="fw-bold fs-4 text-success">@Model.Order.TotalAmount.ToString("C", new System.Globalization.CultureInfo("ar-EG"))</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Items -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0">المنتجات المطلوبة</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-striped mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>المنتج</th>
+                            <th class="text-center">الكمية</th>
+                            <th>سعر الوحدة</th>
+                            <th>الإجمالي الفرعي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.OrderItems)
+                        {
+                            <tr>
+                                <td>@item.ProductName</td>
+                                <td class="text-center">@item.Quantity</td>
+                                <td>@item.UnitPrice.ToString("C", new System.Globalization.CultureInfo("ar-EG"))</td>
+                                <td>@item.TotalPrice.ToString("C", new System.Globalization.CultureInfo("ar-EG"))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

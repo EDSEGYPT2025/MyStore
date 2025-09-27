@@ -1,0 +1,80 @@
+﻿@page "{id:int}"
+@model MyStore.Pages.Manager.Products.EditModel
+@{
+    ViewData["Title"] = "تعديل المنتج";
+    Layout = "~/Pages/Shared/_ManagerLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">@ViewData["Title"]: @Model.Input.Name</h1>
+    <a asp-page="./Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-right me-2"></i>العودة لقائمة المنتجات
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="Input.Id" />
+
+                    <div class="mb-3">
+                        <label asp-for="Input.Name" class="form-label"></label>
+                        <input asp-for="Input.Name" class="form-control" />
+                        <span asp-validation-for="Input.Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.CompanyId" class="form-label"></label>
+                        <select asp-for="Input.CompanyId" class="form-select" asp-items="Model.CompanyNameSL"></select>
+                        <span asp-validation-for="Input.CompanyId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.Price" class="form-label"></label>
+                        <input asp-for="Input.Price" class="form-control" />
+                        <span asp-validation-for="Input.Price" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.Description" class="form-label"></label>
+                        <textarea asp-for="Input.Description" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Input.Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">الصورة الحالية</label>
+                        <div>
+                            @if (!string.IsNullOrEmpty(Model.CurrentImageUrl))
+                            {
+                                <img src="@Model.CurrentImageUrl" class="img-thumbnail" style="max-width: 150px; max-height: 150px;" />
+                            }
+                            else
+                            {
+                                <p class="text-muted">لا توجد صورة حالية.</p>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Input.UploadedImage" class="form-label"></label>
+                        <input asp-for="Input.UploadedImage" type="file" class="form-control" />
+                        <div class="form-text">اختر ملفًا جديدًا فقط إذا أردت تغيير الصورة الحالية.</div>
+                        <span asp-validation-for="Input.UploadedImage" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a asp-page="Index" class="btn btn-secondary">إلغاء</a>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>حفظ التعديلات</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

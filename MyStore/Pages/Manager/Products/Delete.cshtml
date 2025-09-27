@@ -1,0 +1,40 @@
+﻿@page "{id:int}"
+@model MyStore.Pages.Manager.Products.DeleteModel
+@{
+    ViewData["Title"] = "حذف المنتج";
+    Layout = "~/Pages/Shared/_ManagerLayout.cshtml";
+}
+
+<h1 class="h3 mb-4 text-danger">@ViewData["Title"]</h1>
+
+<div class="alert alert-danger" role="alert">
+    <h4 class="alert-heading">تحذير!</h4>
+    <p>أنت على وشك حذف المنتج التالي نهائياً. لا يمكن التراجع عن هذا الإجراء.</p>
+    <hr>
+    <p class="mb-0">هل أنت متأكد أنك تريد المتابعة؟</p>
+</div>
+
+
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5>تفاصيل المنتج الذي سيتم حذفه</h5>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-2">اسم المنتج</dt>
+            <dd class="col-sm-10">@Model.Product.Name</dd>
+
+            <dt class="col-sm-2">الماركة</dt>
+            <dd class="col-sm-10">@Model.Product.Company.Name</dd>
+
+            <dt class="col-sm-2">السعر</dt>
+            <dd class="col-sm-10">@Model.Product.Price.ToString("C", new System.Globalization.CultureInfo("ar-EG"))</dd>
+        </dl>
+
+        <form method="post">
+            <input type="hidden" asp-for="Product.Id" />
+            <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt me-2"></i>نعم، قم بالحذف</button>
+            <a asp-page="./Index" class="btn btn-secondary">إلغاء</a>
+        </form>
+    </div>
+</div>

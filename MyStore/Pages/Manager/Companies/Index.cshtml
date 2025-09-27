@@ -1,0 +1,52 @@
+﻿@page
+@model MyStore.Pages.Manager.Companies.IndexModel
+@{
+    ViewData["Title"] = "إدارة الماركات";
+    Layout = "~/Pages/Shared/_ManagerLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">@ViewData["Title"]</h1>
+    <a asp-page="Create" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>إضافة ماركة جديدة
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        @if (Model.CompanyList.Any())
+        {
+            <table class="table table-hover table-striped mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 80px;">الشعار</th>
+                        <th>اسم الماركة</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.CompanyList)
+                    {
+                        <tr>
+                            <td>
+                                <img src="@(item.LogoUrl ?? "/images/placeholder.png")" class="img-fluid rounded" style="width: 60px; height: 60px; object-fit: cover;" />
+                            </td>
+                            <td class="align-middle">@item.Name</td>
+                            <td class="text-end align-middle">
+                                @* أزرار التعديل والحذف ستضاف هنا مستقبلًا *@
+                                <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">تعديل</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="p-4 text-center text-muted">
+                <i class="fas fa-copyright fa-3x mb-3"></i>
+                <p>لم تقم بإضافة أي ماركات بعد. اضغط على "إضافة ماركة جديدة" للبدء.</p>
+            </div>
+        }
+    </div>
+</div>

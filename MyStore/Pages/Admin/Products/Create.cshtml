@@ -5,52 +5,69 @@
     ViewData["Title"] = "إضافة منتج جديد";
 }
 
-<h1>@ViewData["Title"]</h1>
-
-<h4>منتج</h4>
-<hr />
 <div class="row">
-    <div class="col-md-6">
-        <form method="post" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <div class="form-group mb-3">
-                <label asp-for="Product.Name" class="control-label"></label>
-                <input asp-for="Product.Name" class="form-control" />
-                <span asp-validation-for="Product.Name" class="text-danger"></span>
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h1>@ViewData["Title"]</h1>
             </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-            <div class="form-group mb-3">
-                <label asp-for="Product.Description" class="control-label"></label>
-                <textarea asp-for="Product.Description" class="form-control" rows="3"></textarea>
-                <span asp-validation-for="Product.Description" class="text-danger"></span>
-            </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.Name" class="form-label"></label>
+                        <input asp-for="Input.Name" class="form-control" />
+                        <span asp-validation-for="Input.Name" class="text-danger"></span>
+                    </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="Product.Price" class="control-label"></label>
-                <input asp-for="Product.Price" class="form-control" />
-                <span asp-validation-for="Product.Price" class="text-danger"></span>
-            </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.Description" class="form-label"></label>
+                        <textarea asp-for="Input.Description" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Input.Description" class="text-danger"></span>
+                    </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="Product.CompanyId" class="control-label">الشركة</label>
-                <select asp-for="Product.CompanyId" class="form-control" asp-items="Model.CompanyNameSL">
-                    <option value="">-- اختر شركة --</option>
-                </select>
-                <span asp-validation-for="Product.CompanyId" class="text-danger"></span>
-            </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Input.StoreId" class="form-label"></label>
+                            <select asp-for="Input.StoreId" class="form-select" asp-items="Model.StoreSL">
+                                <option value="">-- اختر المتجر --</option>
+                            </select>
+                            <span asp-validation-for="Input.StoreId" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Input.CompanyId" class="form-label"></label>
+                            <select asp-for="Input.CompanyId" class="form-select" asp-items="Model.CompanySL">
+                                <option value="">-- اختر الماركة --</option>
+                            </select>
+                            <span asp-validation-for="Input.CompanyId" class="text-danger"></span>
+                        </div>
+                    </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="UploadedImage" class="control-label">صورة المنتج</label>
-                <input asp-for="UploadedImage" type="file" class="form-control" />
-                <span asp-validation-for="UploadedImage" class="text-danger"></span>
-            </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Input.Price" class="form-label"></label>
+                            <input asp-for="Input.Price" class="form-control" />
+                            <span asp-validation-for="Input.Price" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Input.UploadedImage" class="form-label"></label>
+                            <input asp-for="Input.UploadedImage" type="file" class="form-control" />
+                            <span asp-validation-for="Input.UploadedImage" class="text-danger"></span>
+                        </div>
+                    </div>
 
-            <div class="form-group">
-                <input type="submit" value="إضافة" class="btn btn-primary" />
-                <a asp-page="Index" class="btn btn-secondary">العودة للقائمة</a>
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i> إضافة المنتج
+                        </button>
+                        <a asp-page="Index" class="btn btn-secondary">
+                            <i class="fas fa-times me-1"></i> إلغاء
+                        </a>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 

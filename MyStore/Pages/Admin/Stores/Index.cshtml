@@ -1,0 +1,85 @@
+﻿@page
+@model MyStore.Pages.Admin.Stores.IndexModel
+@{
+    ViewData["Title"] = "إدارة المتاجر";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">@ViewData["Title"]</h1>
+    <a asp-page="Create" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>إضافة متجر جديد
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover table-striped mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>اسم المتجر</th>
+                    <th>المالك</th>
+                    <th>الهاتف</th>
+                    <th>تاريخ الإنشاء</th>
+                    <th class="text-center">الحالة</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.StoresList)
+                {
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="@(item.LogoUrl ?? "/images/placeholder.png")" alt="Logo" class="rounded-circle me-2" width="40" height="40" style="object-fit: cover;" />
+                                <div>
+                                    <div class="fw-bold">@item.Name</div>
+                                    <a href="@item.StoreUrl" target="_blank" class="text-muted small">@item.Slug</a>
+                                </div>
+                            </div>
+                        </td>
+                        <td>@item.OwnerName</td>
+                        <td>@item.OwnerPhone</td>
+                        <td>@item.CreatedAt.ToShortDateString()</td>
+                        <td class="text-center">
+                            @if (item.IsActive)
+                            {
+                                <span class="badge bg-success-soft text-success">نشط</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger-soft text-danger">متوقف</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <!-- === الزر الجديد الذي تمت إضافته === -->
+                            <a asp-page="./ManageUsers" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info" title="إدارة المستخدمين">
+                                <i class="fas fa-users"></i>
+                            </a>
+
+                            <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary" title="تعديل">
+                                <i class="fas fa-pencil-alt"></i>
+                            </a>
+
+                            <form method="post" asp-page-handler="ToggleStatus" asp-route-id="@item.Id" class="d-inline">
+                                <button type="submit" class="btn btn-sm @(item.IsActive ? "btn-outline-warning" : "btn-outline-success")"
+                                        title="@(item.IsActive ? "إيقاف المتجر" : "تفعيل المتجر")">
+                                    <i class="fas @(item.IsActive ? "fa-toggle-off" : "fa-toggle-on")"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

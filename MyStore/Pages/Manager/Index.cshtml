@@ -1,0 +1,56 @@
+﻿@page
+@model MyStore.Pages.Manager.IndexModel
+@{
+    ViewData["Title"] = "لوحة التحكم الرئيسية";
+    Layout = "~/Pages/Shared/_ManagerLayout.cshtml";
+}
+
+<h1 class="h3 mb-4">أهلاً بك، @Model.CurrentStore.OwnerName</h1>
+
+<div class="row">
+    <div class="col-xl-6 col-md-6 mb-4">
+        <div class="card border-start border-primary border-4 shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col me-2">
+                        <div class="text-xs fw-bold text-primary text-uppercase mb-1">
+                            عدد المنتجات
+                        </div>
+                        <div class="h5 mb-0 fw-bold text-gray-800">@Model.ProductCount</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-box-open fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6 col-md-6 mb-4">
+        <div class="card border-start border-success border-4 shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col me-2">
+                        <div class="text-xs fw-bold text-success text-uppercase mb-1">
+                            إجمالي الطلبات
+                        </div>
+                        <div class="h5 mb-0 fw-bold text-gray-800">@Model.OrderCount</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-receipt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info">
+    <p class="mb-0">
+        <strong>رابط متجرك هو:</strong>
+        <a href="@Url.Page("/Index", new { storeSlug = Model.CurrentStore.Slug })" target="_blank" class="alert-link">
+            @Url.PageLink("/Index", null, new { storeSlug = Model.CurrentStore.Slug }, Request.Scheme)
+        </a>
+    </p>
+</div>
+

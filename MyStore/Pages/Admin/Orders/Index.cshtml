@@ -90,11 +90,11 @@
                         var cartItems = new List<CartItemDto>();
                         try
                         {
-                            if (!string.IsNullOrEmpty(item.OrderDetails))
+                            if (!string.IsNullOrEmpty(item.OrderDetailsJson))
                             {
                                 // === CRITICAL FIX: Use JsonSerializerOptions to ignore case sensitivity ===
                                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                                cartItems = JsonSerializer.Deserialize<List<CartItemDto>>(item.OrderDetails, options);
+                                cartItems = JsonSerializer.Deserialize<List<CartItemDto>>(item.OrderDetailsJson, options);
                             }
                         }
                         catch

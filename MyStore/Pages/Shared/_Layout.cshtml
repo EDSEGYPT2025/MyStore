@@ -14,10 +14,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 
     <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" xintegrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
-    <!-- Custom Stylesheets -->
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <!-- === الإصلاح: تحميل ملف التصميم الصحيح style.css === -->
     <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MyStore.styles.css" asp-append-version="true" />
 </head>
@@ -32,20 +31,12 @@
                 </button>
                 <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">المتجر</a>
-                        </li>
                         @if (User.IsInRole("Admin"))
                         {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdownAdmin" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    لوحة التحكم
+                            <li class="nav-item">
+                                <a class="nav-link text-primary fw-bold" asp-area="" asp-page="/Admin/Stores/Index">
+                                    <i class="fas fa-cogs me-1"></i> لوحة التحكم
                                 </a>
-                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownAdmin">
-                                    <li><a class="dropdown-item" asp-area="" asp-page="/Admin/Companies/Index">إدارة الشركات</a></li>
-                                    <li><a class="dropdown-item" asp-area="" asp-page="/Admin/Products/Index">إدارة المنتجات</a></li>
-                                    <li><a class="dropdown-item" asp-area="" asp-page="/Admin/Orders/Index">إدارة الطلبات</a></li>
-                                </ul>
                             </li>
                         }
                     </ul>
@@ -60,18 +51,11 @@
         </main>
     </div>
 
-    @*<footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; @DateTime.Now.Year - MyStore - <a asp-area="" asp-page="/Privacy">Privacy</a>
-        </div>
-    </footer>*@
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
 
-    <!-- Store-specific JS, 'defer' is important to prevent loading errors -->
-    <script src="~/js/store.js" asp-append-version="true" defer></script>
+    <!-- === الإصلاح النهائي: تحميل ملف الجافاسكريبت الصحيح store.js === -->
+    <script src="~/js/store.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

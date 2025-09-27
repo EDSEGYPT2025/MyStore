@@ -1,80 +1,111 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MyStore.Data;
 using MyStore.Models;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MyStore.Pages.Admin.Products
 {
     [Authorize(Roles = "Admin")]
     public class CreateModel : PageModel
     {
-        private readonly MyStore.Data.ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _hostEnvironment;
 
-        public CreateModel(MyStore.Data.ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
+        public CreateModel(ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
         {
             _context = context;
             _hostEnvironment = hostEnvironment;
         }
 
-        // This holds the list of companies for the dropdown
-        public SelectList CompanyNameSL { get; set; }
+        [BindProperty]
+        public InputModel Input { get; set; }
 
-        public IActionResult OnGet()
+        // قوائم منسدلة للمتاجر والماركات
+        public SelectList StoreSL { get; set; }
+        public SelectList CompanySL { get; set; }
+
+        public class InputModel
         {
-            // Populate the dropdown list with companies from the database
-            CompanyNameSL = new SelectList(_context.Companies, "Id", "Name");
-            return Page();
+            [Required(ErrorMessage = "اسم المنتج مطلوب")]
+            [Display(Name = "اسم المنتج")]
+            public string Name { get; set; }
+
+            [Display(Name = "وصف المنتج")]
+            public string? Description { get; set; }
+
+            [Required(ErrorMessage = "سعر المنتج مطلوب")]
+            [Display(Name = "السعر")]
+            [DataType(DataType.Currency)]
+            [Range(0.01, 1000000.00, ErrorMessage = "الرجاء إدخال سعر صحيح")]
+            public decimal Price { get; set; }
+
+            [Required(ErrorMessage = "الرجاء اختيار المتجر (البائع)")]
+            [Display(Name = "المتجر (البائع)")]
+            public int StoreId { get; set; }
+
+            [Required(ErrorMessage = "الرجاء اختيار الماركة (الشركة المصنّعة)")]
+            [Display(Name = "الماركة (المصنّع)")]
+            public int CompanyId { get; set; }
+
+            [Display(Name = "صورة المنتج")]
+            public IFormFile? UploadedImage { get; set; }
         }
 
-        [BindProperty]
-        public Product Product { get; set; }
-
-        [BindProperty]
-        [Required(ErrorMessage = "الرجاء اختيار صورة للمنتج")]
-        [Display(Name = "صورة المنتج")]
-        public IFormFile UploadedImage { get; set; }
-
+        public void OnGet()
+        {
+            // جلب بيانات القوائم المنسدلة عند تحميل الصفحة
+            PopulateDropdowns();
+        }
 
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
-                // If the model is invalid, we must repopulate the dropdown before returning the page
-                CompanyNameSL = new SelectList(_context.Companies, "Id", "Name");
+                // في حالة وجود خطأ، يجب إعادة تعبئة القوائم المنسدلة
+                PopulateDropdowns();
                 return Page();
             }
 
-            // Image Upload Logic
-            if (UploadedImage != null)
+            var newProduct = new Product
             {
-                string fileName = Guid.NewGuid().ToString() + Path.GetExtension(UploadedImage.FileName);
-                string imagePath = Path.Combine(_hostEnvironment.WebRootPath, "images", "products", fileName);
+                Name = Input.Name,
+                Description = Input.Description,
+                Price = Input.Price,
+                StoreId = Input.StoreId,
+                CompanyId = Input.CompanyId
+            };
 
-                Directory.CreateDirectory(Path.GetDirectoryName(imagePath));
+            // --- منطق رفع وحفظ الصورة (إن وجدت) ---
+            if (Input.UploadedImage != null)
+            {
+                string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "images", "products");
+                Directory.CreateDirectory(uploadsFolder);
 
-                using (var fileStream = new FileStream(imagePath, FileMode.Create))
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetExtension(Input.UploadedImage.FileName);
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    await UploadedImage.CopyToAsync(fileStream);
+                    await Input.UploadedImage.CopyToAsync(fileStream);
                 }
-
-                Product.ImageUrl = "/images/products/" + fileName;
+                newProduct.ImageUrl = "/images/products/" + uniqueFileName;
             }
 
-            _context.Products.Add(Product);
+            _context.Products.Add(newProduct);
             await _context.SaveChangesAsync();
 
+            TempData["SuccessMessage"] = $"تم إضافة المنتج '{newProduct.Name}' بنجاح.";
             return RedirectToPage("./Index");
+        }
+
+        // دالة مساعدة لتجنب تكرار الكود
+        private void PopulateDropdowns()
+        {
+            StoreSL = new SelectList(_context.Stores.OrderBy(s => s.Name), "Id", "Name");
+            CompanySL = new SelectList(_context.Companies.OrderBy(c => c.Name), "Id", "Name");
         }
     }
 }

@@ -1,0 +1,53 @@
+﻿@page
+@model MyStore.Pages.Admin.Stores.CreateModel
+@{
+    ViewData["Title"] = "إضافة متجر جديد";
+    Layout = "_AdminLayout"; // Use the admin layout
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">@ViewData["Title"]</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a asp-page="/Admin/Stores/Index">إدارة المتاجر</a></li>
+        <li class="breadcrumb-item active">إضافة متجر</li>
+    </ol>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-plus-circle me-1"></i>
+            بيانات المتجر الجديد
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.Name" class="form-control" placeholder="اسم المتجر" />
+                            <label asp-for="Input.Name"></label>
+                            <span asp-validation-for="Input.Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.OwnerName" class="form-control" placeholder="اسم المالك" />
+                            <label asp-for="Input.OwnerName"></label>
+                            <span asp-validation-for="Input.OwnerName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input asp-for="Input.OwnerPhone" class="form-control" placeholder="رقم هاتف المالك" />
+                            <label asp-for="Input.OwnerPhone"></label>
+                            <span asp-validation-for="Input.OwnerPhone" class="text-danger"></span>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>حفظ وإنشاء المتجر</button>
+                            <a asp-page="Index" class="btn btn-secondary">إلغاء</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
