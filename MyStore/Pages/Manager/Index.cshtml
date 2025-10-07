@@ -5,52 +5,135 @@
     Layout = "~/Pages/Shared/_ManagerLayout.cshtml";
 }
 
-<h1 class="h3 mb-4">أهلاً بك، @Model.CurrentStore.OwnerName</h1>
+<!--
+    English: Main header for the dashboard.
+    العربية: الترويسة الرئيسية للداشبورد
+-->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+    <div>
+        <h1 class="text-2xl lg:text-3xl font-bold text-foreground">لوحة التحكم</h1>
+        <p class="text-muted-foreground mt-1">أهلاً بعودتك، @Model.CurrentStore.OwnerName!</p>
+    </div>
+    <a asp-page="/Manager/Products/Create" class="btn btn-primary inline-flex items-center gap-2">
+        <i data-lucide="plus" class="w-4 h-4"></i>
+        <span>إضافة منتج جديد</span>
+    </a>
+</div>
 
-<div class="row">
-    <div class="col-xl-6 col-md-6 mb-4">
-        <div class="card border-start border-primary border-4 shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col me-2">
-                        <div class="text-xs fw-bold text-primary text-uppercase mb-1">
-                            عدد المنتجات
-                        </div>
-                        <div class="h5 mb-0 fw-bold text-gray-800">@Model.ProductCount</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-box-open fa-2x text-gray-300"></i>
-                    </div>
-                </div>
+<!--
+    English: Statistics cards section. These are clickable and lead to relevant pages.
+    العربية: قسم بطاقات الإحصائيات. هذه البطاقات قابلة للنقر وتؤدي إلى الصفحات ذات الصلة
+-->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <!-- Products Card -->
+    <a asp-page="/Manager/Products/Index" class="card-link no-underline">
+        <div class="card p-4 flex flex-row items-center gap-4 hover:border-primary-500">
+            <div class="bg-primary-50 text-primary-600 rounded-full p-3"><i data-lucide="package" class="w-8 h-8"></i></div>
+            <div>
+                <p class="text-muted-foreground">المنتجات</p>
+                <h3 class="text-3xl font-bold">@Model.ProductCount</h3>
             </div>
         </div>
+    </a>
+    <!-- Orders Card -->
+    <a asp-page="/Manager/Orders/Index" class="card-link no-underline">
+        <div class="card p-4 flex flex-row items-center gap-4 hover:border-green-500">
+            <div class="bg-green-100 text-green-600 rounded-full p-3"><i data-lucide="receipt" class="w-8 h-8"></i></div>
+            <div>
+                <p class="text-muted-foreground">الطلبات</p>
+                <h3 class="text-3xl font-bold">@Model.OrderCount</h3>
+            </div>
+        </div>
+    </a>
+    <!-- Dummy Visits Card -->
+    <div class="card p-4 flex flex-row items-center gap-4">
+        <div class="bg-yellow-100 text-yellow-600 rounded-full p-3"><i data-lucide="bar-chart-3" class="w-8 h-8"></i></div>
+        <div>
+            <p class="text-muted-foreground">الزيارات</p>
+            <h3 class="text-3xl font-bold">2,150</h3>
+        </div>
     </div>
+    <!-- Dummy Rating Card -->
+    <div class="card p-4 flex flex-row items-center gap-4">
+        <div class="bg-red-100 text-red-600 rounded-full p-3"><i data-lucide="star" class="w-8 h-8"></i></div>
+        <div>
+            <p class="text-muted-foreground">التقييم</p>
+            <h3 class="text-3xl font-bold">4.8</h3>
+        </div>
+    </div>
+</div>
 
-    <div class="col-xl-6 col-md-6 mb-4">
-        <div class="card border-start border-success border-4 shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col me-2">
-                        <div class="text-xs fw-bold text-success text-uppercase mb-1">
-                            إجمالي الطلبات
-                        </div>
-                        <div class="h5 mb-0 fw-bold text-gray-800">@Model.OrderCount</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-receipt fa-2x text-gray-300"></i>
-                    </div>
-                </div>
+<!--
+    English: Main content grid with Sales Chart and Recent Orders table.
+    العربية: الشبكة الرئيسية للمحتوى مع الرسم البياني للمبيعات وجدول أحدث الطلبات
+-->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 card">
+        <div class="card-header"><h6 class="font-bold">نظرة عامة على المبيعات</h6></div>
+        <div class="card-body">
+            <canvas id="myAreaChart" style="height: 320px;"></canvas>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header flex justify-between items-center">
+            <h6 class="font-bold">أحدث الطلبات</h6>
+            <a asp-page="/Manager/Orders/Index" class="text-sm text-primary-600 hover:underline">عرض الكل</a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <tbody>
+                        @if (Model.RecentOrders.Any())
+                        {
+                            @foreach (var order in Model.RecentOrders)
+                            {
+                                <tr>
+                                    <td class="p-4"><a asp-page="/Manager/Orders/Details" asp-route-id="@order.Id" class="hover:underline font-semibold">@order.OrderNumber</a></td>
+                                    <td class="p-4 text-muted-foreground">@order.CustomerName</td>
+                                    <td class="p-4 text-green-600 font-bold">@order.TotalAmount.ToString("N2") ج.م</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="3" class="text-center p-4 text-muted-foreground">لا توجد طلبات حديثة.</td></tr>
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
 
-<div class="alert alert-info">
-    <p class="mb-0">
-        <strong>رابط متجرك هو:</strong>
-        <a href="@Url.Page("/Index", new { storeSlug = Model.CurrentStore.Slug })" target="_blank" class="alert-link">
-            @Url.PageLink("/Index", null, new { storeSlug = Model.CurrentStore.Slug }, Request.Scheme)
-        </a>
-    </p>
-</div>
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // --- Chart.js Logic ---
+            const ctx = document.getElementById('myAreaChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو"],
+                        datasets: [{
+                            label: "المبيعات",
+                            data: [1200, 1900, 3000, 5000, 2300, 3200, 4500], // Dummy data
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true } },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+        });
+    </script>
+}
 

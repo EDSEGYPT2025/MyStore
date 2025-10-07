@@ -1,176 +1,53 @@
-﻿/**
- * MyStore Front-End Logic (Multi-Store Version)
- * Handles client-side filtering, searching, and the complete shopping cart functionality.
- */
+﻿
 document.addEventListener('DOMContentLoaded', function () {
-    // --- CONFIGURATION ---
-    const WHATSAPP_NUMBER = "201010475455"; // ⚠️ غيّر هذا الرقم إلى رقمك مع كود الدولة
-
-    // --- DOM ELEMENT SELECTORS ---
-    const storeContainer = document.querySelector('.store-container');
-    if (!storeContainer) return; // Exit if not on a store page
-
-    const currentStoreIdInput = document.getElementById('current-store-id');
-    const searchInput = document.getElementById('product-search-input');
-    const companyButtons = document.querySelectorAll('.company-card-btn');
-    const productsList = document.getElementById('products-list');
-    const productCardWrappers = document.querySelectorAll('.product-card-wrapper');
-
-    // Cart Elements
-    const desktopCartItemsContainer = document.querySelector('#cart-sidebar #cart-items');
-    const desktopCartTotal = document.querySelector('#cart-sidebar #cart-total');
-    const desktopEmptyCartMsg = document.querySelector('#cart-sidebar .cart-empty-msg');
-    const mobileCartContent = document.getElementById('mobile-cart-content');
-    const mobileCartBtn = document.getElementById('mobile-cart-btn');
-    const mobileCartCount = document.getElementById('mobile-cart-count');
-    const checkoutModalEl = document.getElementById('checkoutModal');
-    const checkoutModal = checkoutModalEl ? new bootstrap.Modal(checkoutModalEl) : null;
-
-    // --- STATE MANAGEMENT ---
+    // --- CONFIGURATION & STATE ---
+    const WHATSAPP_NUMBER = "201010475455";
     let cart = [];
 
-    // --- EVENT LISTENERS ---
+    // --- SELECTORS ---
+    const currentStoreIdInput = document.getElementById('current-store-id');
+    const checkoutModalEl = document.getElementById('checkoutModal');
+    const checkoutModal = checkoutModalEl ? new bootstrap.Modal(checkoutModalEl) : null;
+    const productDetailsModalEl = document.getElementById('productDetailsModal');
+    const productDetailsModal = productDetailsModalEl ? new bootstrap.Modal(productDetailsModalEl) : null;
 
-    // 1. Handle Company Button Filtering
-    companyButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            companyButtons.forEach(btn => btn.classList.remove('active'));
-            this.classList.add('active');
-            const selectedCompanyId = this.dataset.companyId;
-            filterProductsByCompany(selectedCompanyId);
-        });
-    });
+    // Desktop
+    const desktopProductWrappers = document.querySelectorAll('#products-list-desktop .product-card-wrapper');
+    const desktopCompanyButtons = document.querySelectorAll('#companies-section-desktop .company-card-btn');
+    const desktopSearchInput = document.getElementById('product-search-input-desktop');
+    const desktopCartContainer = document.getElementById('cart-items-desktop');
+    const desktopCartTotal = document.getElementById('cart-total-desktop');
+    const desktopEmptyMsg = document.querySelector('#cart-sidebar .cart-empty-msg');
 
-    // 2. Handle Product Search (Client-side)
-    let searchTimeout;
-    searchInput.addEventListener('input', function () {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            filterProductsBySearch(this.value.trim());
-        }, 300);
-    });
-
-    // 3. Handle Add to Cart Clicks
-    productsList.addEventListener('click', function (e) {
-        const addToCartBtn = e.target.closest('.add-to-cart-btn');
-        if (addToCartBtn) {
-            const product = {
-                id: parseInt(addToCartBtn.dataset.productId),
-                name: addToCartBtn.dataset.productName,
-                price: parseFloat(addToCartBtn.dataset.productPrice),
-                imageUrl: addToCartBtn.dataset.productImage
-            };
-            if (product && product.id) {
-                addToCart(product);
-                addToCartBtn.innerHTML = '<i class="fas fa-check"></i> تمت الإضافة';
-                setTimeout(() => {
-                    addToCartBtn.innerHTML = '<i class="fas fa-cart-plus me-1"></i> إضافة للسلة';
-                }, 1000);
-            }
-        }
-    });
-
-    // 4. Handle Cart Quantity Changes & Deletions
-    document.body.addEventListener('click', function (e) {
-        if (e.target.closest('.qty-btn')) {
-            const button = e.target.closest('.qty-btn');
-            updateQuantity(parseInt(button.dataset.productId), button.dataset.action);
-        }
-        if (e.target.closest('.remove-item')) {
-            const button = e.target.closest('.remove-item');
-            updateQuantity(parseInt(button.dataset.productId), 'remove');
-        }
-    });
-
-    // 5. Handle Checkout Button Click (Opens Modal) - Corrected to use class
-    document.body.addEventListener('click', function (e) {
-        if (e.target.closest('.checkout-btn')) {
-            if (cart.length > 0 && checkoutModal) {
-                checkoutModal.show();
-            }
-        }
-    });
-
-    // 6. Handle Confirm Order Button Click (Sends Data)
-    if (checkoutModalEl) {
-        checkoutModalEl.addEventListener('click', async function (e) {
-            if (e.target.id === 'confirm-order-btn') {
-                const confirmOrderBtn = e.target;
-                const checkoutForm = document.getElementById('checkout-form');
-                if (!checkoutForm.checkValidity()) {
-                    checkoutForm.classList.add('was-validated');
-                    return;
-                }
-
-                confirmOrderBtn.disabled = true;
-                confirmOrderBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> جارٍ التأكيد...`;
-
-                const orderData = {
-                    customerName: document.getElementById('customer-name').value,
-                    customerPhone: document.getElementById('customer-phone').value,
-                    customerAddress: document.getElementById('customer-address').value,
-                    cartItems: cart.map(item => ({ id: item.id, quantity: item.quantity })),
-                    storeId: parseInt(currentStoreIdInput.value)
-                };
-
-                try {
-                    const response = await fetch(`${window.location.pathname}?handler=CreateOrder`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value },
-                        body: JSON.stringify(orderData)
-                    });
-
-                    const result = await response.json();
-                    if (result.success) {
-                        const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-                        let message = `*طلب جديد برقم: ${result.orderNumber}*\n\n*الاسم:* ${orderData.customerName}\n*الهاتف:* ${orderData.customerPhone}\n*العنوان:* ${orderData.customerAddress}\n\n*-- تفاصيل الطلب --*\n`;
-                        cart.forEach(item => { message += `- ${item.name} (الكمية: ${item.quantity}) - ${(item.price * item.quantity).toFixed(2)} جنيه\n`; });
-                        message += `\n*الإجمالي: ${totalAmount.toFixed(2)} جنيه*`;
-
-                        window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-
-                        cart = [];
-                        updateCartDisplay();
-                        checkoutModal.hide();
-                    } else {
-                        alert(`حدث خطأ:\n${result.message}`);
-                    }
-                } catch (error) {
-                    console.error("Order creation failed:", error);
-                    alert("فشل الاتصال بالخادم. الرجاء التحقق من اتصالك بالإنترنت.");
-                } finally {
-                    confirmOrderBtn.disabled = false;
-                    confirmOrderBtn.innerHTML = 'تأكيد الطلب عبر واتساب';
-                }
-            }
-        });
-    }
+    // Mobile
+    const mobileProductWrappers = document.querySelectorAll('#products-list-mobile .product-card-wrapper');
+    const mobileCompanyButtons = document.querySelectorAll('#companies-section-mobile .company-card-btn');
+    const mobileSearchInput = document.getElementById('product-search-input-mobile');
+    const mobileCartContainer = document.getElementById('cart-items-mobile');
+    const mobileCartTotal = document.getElementById('cart-total-mobile');
+    const mobileEmptyMsg = document.querySelector('.cart-empty-msg-mobile');
+    const bottomNavButtons = document.querySelectorAll('.app-bottom-nav .nav-btn');
+    const appViews = document.querySelectorAll('.app-view');
+    const mobileCartCount = document.getElementById('bottom-nav-cart-count');
+    const mobileCartFooter = document.querySelector('.cart-footer-mobile');
 
     // --- FUNCTIONS ---
 
-    function filterProductsByCompany(companyId) {
-        productCardWrappers.forEach(card => {
-            const cardCompanyId = card.dataset.companyId;
-            if (companyId === '0' || cardCompanyId === companyId) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    }
+    function showProductDetails(productData) {
+        if (!productDetailsModalEl) return;
 
-    function filterProductsBySearch(query) {
-        const lowerCaseQuery = query.toLowerCase();
-        companyButtons.forEach(btn => btn.classList.remove('active'));
+        document.getElementById('modal-product-image').src = productData.image;
+        document.getElementById('modal-product-name').textContent = productData.name;
+        document.getElementById('modal-product-description').textContent = productData.description;
+        document.getElementById('modal-product-price').textContent = `${parseFloat(productData.price).toFixed(2)} جنيه`;
 
-        productCardWrappers.forEach(card => {
-            const productName = card.querySelector('.card-title')?.textContent.toLowerCase() || '';
-            if (productName.includes(lowerCaseQuery)) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
-            }
-        });
+        const modalAddToCartBtn = document.getElementById('modal-add-to-cart-btn');
+        modalAddToCartBtn.dataset.productId = productData.id;
+        modalAddToCartBtn.dataset.productName = productData.name;
+        modalAddToCartBtn.dataset.productPrice = productData.price;
+        modalAddToCartBtn.dataset.productImage = productData.image;
+
+        productDetailsModal.show();
     }
 
     function addToCart(product) {
@@ -187,30 +64,22 @@ document.addEventListener('DOMContentLoaded', function () {
         const itemIndex = cart.findIndex(item => item.id === productId);
         if (itemIndex === -1) return;
 
-        if (action === 'increment') {
-            cart[itemIndex].quantity++;
-        } else if (action === 'decrement') {
+        if (action === 'increment') cart[itemIndex].quantity++;
+        else if (action === 'decrement') {
             cart[itemIndex].quantity--;
-            if (cart[itemIndex].quantity <= 0) {
-                cart.splice(itemIndex, 1);
-            }
-        } else if (action === 'remove') {
-            cart.splice(itemIndex, 1);
-        }
+            if (cart[itemIndex].quantity <= 0) cart.splice(itemIndex, 1);
+        } else if (action === 'remove') cart.splice(itemIndex, 1);
+
         updateCartDisplay();
     }
 
     function updateCartDisplay() {
         const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
         const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-        const cartHasItems = cart.length > 0;
-
-        const cartHtml = cartHasItems ? cart.map(item => `
+        const hasItems = cart.length > 0;
+        const cartHtml = hasItems ? cart.map(item => `
             <div class="cart-item">
-                <div class="item-info">
-                    <span class="item-name">${item.name}</span>
-                    <span class="item-price">${item.quantity} × ${item.price.toFixed(2)} جنيه</span>
-                </div>
+                <div class="item-info"><span class="item-name">${item.name}</span><span class="item-price">${item.quantity} × ${item.price.toFixed(2)} جنيه</span></div>
                 <div class="item-controls">
                     <button class="btn btn-sm btn-outline-secondary qty-btn" data-product-id="${item.id}" data-action="increment">+</button>
                     <span class="item-qty">${item.quantity}</span>
@@ -219,36 +88,203 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             </div>`).join('') : '';
 
-        const desktopCheckoutBtn = document.querySelector('#cart-sidebar .checkout-btn');
-        if (desktopCartItemsContainer) {
-            desktopCartItemsContainer.innerHTML = cartHtml;
-            desktopCartTotal.textContent = `${total.toFixed(2)}`;
-            if (desktopCheckoutBtn) desktopCheckoutBtn.disabled = !cartHasItems;
-            desktopEmptyCartMsg.classList.toggle('d-none', cartHasItems);
+        // Update Desktop
+        if (desktopCartContainer) {
+            desktopCartContainer.innerHTML = cartHtml;
+            desktopCartTotal.textContent = total.toFixed(2);
+            document.querySelectorAll('.desktop-container .checkout-btn').forEach(btn => btn.disabled = !hasItems);
+            if (desktopEmptyMsg) desktopEmptyMsg.style.display = hasItems ? 'none' : 'block';
         }
 
-        if (mobileCartBtn && mobileCartCount) {
-            mobileCartCount.textContent = totalItems;
-            mobileCartBtn.style.display = cartHasItems ? 'flex' : 'none';
-        }
+        // Update Mobile
+        if (mobileCartContainer) {
+            mobileCartContainer.innerHTML = cartHtml;
+            mobileCartTotal.textContent = total.toFixed(2);
+            document.querySelectorAll('.app-shell .checkout-btn').forEach(btn => btn.disabled = !hasItems);
+            if (mobileEmptyMsg) mobileEmptyMsg.style.display = hasItems ? 'none' : 'block';
+            if (mobileCartCount) mobileCartCount.textContent = totalItems;
 
-        if (mobileCartContent) {
-            // Corrected to use class for the checkout button
-            mobileCartContent.innerHTML = `
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-shopping-cart me-2"></i>سلة المشتريات</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">${cartHasItems ? cartHtml : '<p class="cart-empty-msg text-center text-muted">سلتك فارغة حالياً.</p>'}</div>
-                <div class="modal-footer">
-                    <div class="w-100">
-                        <div class="d-flex justify-content-between"><strong>الإجمالي</strong><strong><span>${total.toFixed(2)}</span> جنيه</strong></div>
-                        <div class="d-grid mt-3"><button class="btn btn-success btn-lg checkout-btn" ${!cartHasItems ? 'disabled' : ''}><i class="fab fa-whatsapp me-2"></i>إتمام الطلب</button></div>
-                    </div>
-                </div>`;
+            const cartViewIsActive = document.getElementById('view-cart')?.classList.contains('active');
+            if (mobileCartFooter) mobileCartFooter.style.display = (cartViewIsActive && hasItems) ? 'block' : 'none';
         }
     }
 
-    // --- Initialize ---
+    async function submitOrder() {
+        const confirmOrderBtn = document.getElementById('confirm-order-btn');
+        const checkoutForm = document.getElementById('checkout-form');
+        if (!checkoutForm.checkValidity()) {
+            checkoutForm.classList.add('was-validated');
+            return;
+        }
+
+        confirmOrderBtn.disabled = true;
+        confirmOrderBtn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> جارٍ التأكيد...`;
+
+        const orderData = {
+            customerName: document.getElementById('customer-name').value,
+            customerPhone: document.getElementById('customer-phone').value,
+            customerAddress: document.getElementById('customer-address').value,
+            cartItems: cart.map(item => ({ id: item.id, quantity: item.quantity })),
+            storeId: parseInt(currentStoreIdInput.value)
+        };
+
+        try {
+            const response = await fetch(`${window.location.pathname}?handler=CreateOrder`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value },
+                body: JSON.stringify(orderData)
+            });
+            const result = await response.json();
+            if (result.success) {
+                const totalAmount = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+                let message = `*طلب جديد برقم: ${result.orderNumber}*\n\n*الاسم:* ${orderData.customerName}\n*الهاتف:* ${orderData.customerPhone}\n*العنوان:* ${orderData.customerAddress}\n\n*-- تفاصيل الطلب --*\n`;
+                cart.forEach(item => { message += `- ${item.name} (الكمية: ${item.quantity}) - ${(item.price * item.quantity).toFixed(2)} جنيه\n`; });
+                message += `\n*الإجمالي: ${totalAmount.toFixed(2)} جنيه*`;
+                window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+                cart = [];
+                updateCartDisplay();
+                checkoutModal.hide();
+            } else {
+                alert(`حدث خطأ: ${result.message}`);
+            }
+        } catch (error) {
+            console.error("Order creation failed:", error);
+            alert("فشل الاتصال بالخادم.");
+        } finally {
+            confirmOrderBtn.disabled = false;
+            confirmOrderBtn.innerHTML = 'تأكيد الطلب';
+        }
+    }
+
+    // --- EVENT LISTENERS ---
+
+    document.body.addEventListener('click', function (e) {
+        const addToCartBtn = e.target.closest('.add-to-cart-btn');
+        const productCardWrapper = e.target.closest('.product-card-wrapper');
+
+        if (addToCartBtn) {
+            e.stopPropagation();
+
+            let productDataContainer = addToCartBtn.closest('.product-card-wrapper');
+            if (addToCartBtn.id === 'modal-add-to-cart-btn') {
+                productDataContainer = addToCartBtn;
+            }
+
+            const product = {
+                id: parseInt(productDataContainer.dataset.productId),
+                name: productDataContainer.dataset.productName,
+                price: parseFloat(productDataContainer.dataset.productPrice),
+                imageUrl: productDataContainer.dataset.productImage
+            };
+
+            if (product.id) {
+                addToCart(product);
+                if (addToCartBtn.id === 'modal-add-to-cart-btn') {
+                    productDetailsModal.hide();
+                } else {
+                    addToCartBtn.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => {
+                        const originalIcon = '<i class="fas fa-cart-plus me-1"></i>';
+                        const buttonText = addToCartBtn.textContent.includes("إضافة") ? ' إضافة للسلة' : '';
+                        addToCartBtn.innerHTML = originalIcon + buttonText;
+                    }, 1000);
+                }
+            }
+        }
+        else if (productCardWrapper) {
+            const productData = {
+                id: parseInt(productCardWrapper.dataset.productId),
+                name: productCardWrapper.dataset.productName,
+                price: parseFloat(productCardWrapper.dataset.productPrice),
+                image: productCardWrapper.dataset.productImage,
+                description: productCardWrapper.dataset.productDescription
+            };
+            if (productData.id) {
+                showProductDetails(productData);
+            }
+        }
+
+        const qtyBtn = e.target.closest('.qty-btn');
+        if (qtyBtn) updateQuantity(parseInt(qtyBtn.dataset.productId), qtyBtn.dataset.action);
+
+        const removeItemBtn = e.target.closest('.remove-item');
+        if (removeItemBtn) updateQuantity(parseInt(removeItemBtn.dataset.productId), 'remove');
+
+        const checkoutBtn = e.target.closest('.checkout-btn');
+        if (checkoutBtn && cart.length > 0 && checkoutModal) checkoutModal.show();
+
+        const confirmOrderBtn = e.target.closest('#confirm-order-btn');
+        if (confirmOrderBtn) submitOrder();
+    });
+
+    // Mobile Bottom Navigation
+    bottomNavButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetViewId = button.dataset.view;
+            appViews.forEach(view => view.classList.toggle('active', view.id === targetViewId));
+            bottomNavButtons.forEach(btn => btn.classList.toggle('active', btn === button));
+            updateCartDisplay();
+        });
+    });
+
+    // --- FILTERING AND SEARCH ---
+
+    // Desktop Filtering
+    desktopCompanyButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            desktopCompanyButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            const companyId = button.dataset.companyId;
+            desktopProductWrappers.forEach(card => {
+                card.style.display = (companyId === '0' || card.dataset.companyId === companyId) ? 'block' : 'none';
+            });
+        });
+    });
+
+    // === الإصلاح النهائي هنا ===
+    // Mobile Filtering
+    if (mobileCompanyButtons) {
+        mobileCompanyButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                mobileCompanyButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                const selectedCompanyId = button.dataset.companyId;
+
+                mobileProductWrappers.forEach(card => {
+                    // Correct comparison
+                    card.style.display = (selectedCompanyId === '0' || card.dataset.companyId === selectedCompanyId) ? 'block' : 'none';
+                });
+
+                // Switch back to the home view to see the filtered results
+                document.querySelector('.nav-btn[data-view="view-home"]').click();
+            });
+        });
+    }
+
+    // Desktop Search
+    if (desktopSearchInput) {
+        desktopSearchInput.addEventListener('input', () => {
+            const query = desktopSearchInput.value.toLowerCase();
+            desktopProductWrappers.forEach(card => {
+                const name = card.dataset.productName.toLowerCase();
+                card.style.display = name.includes(query) ? 'block' : 'none';
+            });
+        });
+    }
+
+    // Mobile Search
+    if (mobileSearchInput) {
+        mobileSearchInput.addEventListener('input', () => {
+            const query = mobileSearchInput.value.toLowerCase();
+            mobileProductWrappers.forEach(card => {
+                const name = card.dataset.productName.toLowerCase();
+                card.style.display = name.includes(query) ? 'block' : 'none';
+            });
+        });
+    }
+
+    // --- INITIALIZATION ---
     updateCartDisplay();
 });
+
+
