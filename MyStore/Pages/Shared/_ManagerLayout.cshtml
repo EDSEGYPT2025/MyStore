@@ -11,7 +11,7 @@
 
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <link rel="stylesheet" href="~/css/admin_layout.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/manager_layout.css" asp-append-version="true" />
 </head>
 <body class="bg-background text-foreground">
 
@@ -60,7 +60,6 @@
     <div class="overlay"></div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-
     @await RenderSectionAsync("Scripts", required: false)
 
     <script>
@@ -75,12 +74,14 @@
                 const themeToggler = document.getElementById('theme-toggler');
                 const htmlEl = document.documentElement;
 
+                // Sidebar Logic
                 if (pageWrapper) {
                     desktopToggler?.addEventListener('click', () => pageWrapper.classList.toggle('sidebar-collapsed'));
                     mobileToggler?.addEventListener('click', () => pageWrapper.classList.add('sidebar-visible'));
                     overlay?.addEventListener('click', () => pageWrapper.classList.remove('sidebar-visible'));
                 }
 
+                // Theme Logic
                 const applyTheme = (theme) => {
                     htmlEl.setAttribute('data-theme', theme);
                     localStorage.setItem('theme', theme);
@@ -91,6 +92,7 @@
                 });
                 applyTheme(localStorage.getItem('theme') || 'light');
 
+                // Active Link Logic
                 const navLinks = document.querySelectorAll('.sidebar-nav .nav-link');
                 const currentPath = window.location.pathname.toLowerCase();
                 let activeLink = null;

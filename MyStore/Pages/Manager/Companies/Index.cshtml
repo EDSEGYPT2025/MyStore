@@ -33,7 +33,11 @@
                     {
                         <tr class="hover:bg-muted/50 transition-colors">
                             <td class="p-4">
-                                <img src="@Url.Content("~" + (item.LogoUrl ?? "/images/placeholder.png"))" class="w-16 h-16 object-contain rounded-lg border bg-white" alt="@item.Name" />
+                                @{
+                                    // **هذا هو الإصلاح:** استخدام الرابط مباشرة لتجنب الخطأ
+                                    var logoUrl = item.LogoUrl ?? "/images/placeholder.png";
+                                }
+                                <img src="@logoUrl" class="w-16 h-16 object-contain rounded-lg border bg-white" alt="@item.Name" />
                             </td>
                             <td class="px-6 py-4 align-middle font-semibold text-foreground">
                                 @item.Name
@@ -62,9 +66,3 @@
         </div>
     }
 </div>
-
-@section Scripts {
-    <script>
-        lucide.createIcons();
-    </script>
-}

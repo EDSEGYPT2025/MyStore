@@ -7,10 +7,10 @@
 
 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
     <div>
-        <h1 class="text-2xl lg:text-3xl font-bold text-foreground">لوحة التحكم</h1>
-        <p class="text-muted-foreground mt-1">أهلاً بعودتك، @Model.CurrentStore.OwnerName!</p>
+        <h1 class="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-slate-50">لوحة التحكم</h1>
+        <p class="text-slate-500 dark:text-slate-400 mt-1">أهلاً بعودتك، @Model.CurrentStore.OwnerName!</p>
     </div>
-    <a asp-page="/Manager/Products/Create" class="inline-flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground font-semibold rounded-lg shadow-sm hover:bg-primary/90 transition-colors">
+    <a asp-page="/Manager/Products/Create" class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-sm hover:bg-indigo-500 transition-colors">
         <i data-lucide="plus" class="w-4 h-4 me-2"></i>
         <span>إضافة منتج جديد</span>
     </a>
@@ -18,111 +18,69 @@
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
     <a asp-page="/Manager/Products/Index" class="group block">
-        <div class="bg-card text-card-foreground rounded-xl border shadow-sm p-5 flex items-center gap-5 transition-all group-hover:border-primary group-hover:shadow-lg">
-            <div class="bg-primary/10 text-primary rounded-full p-3">
+        <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-5 flex items-center gap-5 transition-all group-hover:border-indigo-500 group-hover:shadow-lg">
+            <div class="bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-full p-3">
                 <i data-lucide="package" class="w-8 h-8"></i>
             </div>
             <div>
-                <p class="text-muted-foreground">المنتجات</p>
-                <h3 class="text-3xl font-bold">@Model.ProductCount</h3>
+                <p class="text-slate-500 dark:text-slate-400">المنتجات</p>
+                <h3 class="text-3xl font-bold text-slate-900 dark:text-slate-50">@Model.ProductCount</h3>
             </div>
         </div>
     </a>
     <a asp-page="/Manager/Orders/Index" class="group block">
-        <div class="bg-card text-card-foreground rounded-xl border shadow-sm p-5 flex items-center gap-5 transition-all group-hover:border-green-500 group-hover:shadow-lg">
-            <div class="bg-green-500/10 text-green-600 rounded-full p-3">
+        <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-5 flex items-center gap-5 transition-all group-hover:border-green-500 group-hover:shadow-lg">
+            <div class="bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 rounded-full p-3">
                 <i data-lucide="receipt" class="w-8 h-8"></i>
             </div>
             <div>
-                <p class="text-muted-foreground">الطلبات</p>
-                <h3 class="text-3xl font-bold">@Model.OrderCount</h3>
+                <p class="text-slate-500 dark:text-slate-400">الطلبات</p>
+                <h3 class="text-3xl font-bold text-slate-900 dark:text-slate-50">@Model.OrderCount</h3>
             </div>
         </div>
     </a>
-    <div class="bg-card text-card-foreground rounded-xl border shadow-sm p-5 flex items-center gap-5">
-        <div class="bg-yellow-500/10 text-yellow-600 rounded-full p-3">
+    <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-5 flex items-center gap-5">
+        <div class="bg-yellow-100 dark:bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 rounded-full p-3">
             <i data-lucide="bar-chart-3" class="w-8 h-8"></i>
         </div>
         <div>
-            <p class="text-muted-foreground">الزيارات</p>
-            <h3 class="text-3xl font-bold">2,150</h3>
+            <p class="text-slate-500 dark:text-slate-400">الزيارات</p>
+            <h3 class="text-3xl font-bold text-slate-900 dark:text-slate-50">2,150</h3>
         </div>
     </div>
-    <div class="bg-card text-card-foreground rounded-xl border shadow-sm p-5 flex items-center gap-5">
-        <div class="bg-red-500/10 text-red-600 rounded-full p-3">
+    <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-5 flex items-center gap-5">
+        <div class="bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 rounded-full p-3">
             <i data-lucide="star" class="w-8 h-8"></i>
         </div>
         <div>
-            <p class="text-muted-foreground">التقييم</p>
-            <h3 class="text-3xl font-bold">4.8</h3>
+            <p class="text-slate-500 dark:text-slate-400">التقييم</p>
+            <h3 class="text-3xl font-bold text-slate-900 dark:text-slate-50">4.8</h3>
         </div>
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    @*<div class="lg:col-span-2 bg-card text-card-foreground rounded-xl border shadow-sm">
-        <div class="p-4 border-b">
-            <h6 class="font-semibold">نظرة عامة على المبيعات</h6>
-        </div>
-        <div class="p-4">
-            <canvas id="myAreaChart" style="height: 320px;"></canvas>
-        </div>
-    </div>*@
-    <div class="bg-card text-card-foreground rounded-xl border shadow-sm">
-        <div class="p-4 border-b flex justify-between items-center">
-            <h6 class="font-semibold">أحدث الطلبات</h6>
-            <a asp-page="/Manager/Orders/Index" class="text-sm text-primary hover:underline">عرض الكل</a>
-        </div>
-        <div class="divide-y divide-border">
-            @if (Model.RecentOrders.Any())
+<div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+    <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+        <h6 class="font-semibold text-slate-900 dark:text-slate-50">أحدث الطلبات</h6>
+        <a asp-page="/Manager/Orders/Index" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">عرض الكل</a>
+    </div>
+    <div class="divide-y divide-slate-200 dark:divide-slate-700">
+        @if (Model.RecentOrders.Any())
+        {
+            foreach (var order in Model.RecentOrders)
             {
-                foreach (var order in Model.RecentOrders)
-                {
-                    <div class="p-4 flex justify-between items-center hover:bg-muted/50 transition-colors">
-                        <div>
-                            <a asp-page="/Manager/Orders/Details" asp-route-id="@order.Id" class="font-semibold text-foreground hover:underline">@order.OrderNumber</a>
-                            <p class="text-sm text-muted-foreground">@order.CustomerName</p>
-                        </div>
-                        <div class="text-green-600 font-bold">@order.TotalAmount.ToString("N2") ج.م</div>
+                <div class="p-4 flex justify-between items-center hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                    <div>
+                        <a asp-page="/Manager/Orders/Details" asp-route-id="@order.Id" class="font-semibold text-slate-900 dark:text-slate-50 hover:underline">@order.OrderNumber</a>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">@order.CustomerName</p>
                     </div>
-                }
+                    <div class="text-green-600 dark:text-green-400 font-bold">@order.TotalAmount.ToString("N2") ج.م</div>
+                </div>
             }
-            else
-            {
-                <div class="p-6 text-center text-muted-foreground">لا توجد طلبات حديثة.</div>
-            }
-        </div>
+        }
+        else
+        {
+            <div class="p-6 text-center text-slate-500 dark:text-slate-400">لا توجد طلبات حديثة.</div>
+        }
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // --- Chart.js Logic ---
-            const ctx = document.getElementById('myAreaChart');
-            if (ctx) {
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو"],
-                        datasets: [{
-                            label: "المبيعات",
-                            data: [1200, 1900, 3000, 5000, 2300, 3200, 4500], // Dummy data
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderColor: 'rgba(59, 130, 246, 1)',
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: { y: { beginAtZero: true } },
-                        plugins: { legend: { display: false } }
-                    }
-                });
-            }
-        });
-    </script>
-}

@@ -1,0 +1,275 @@
+﻿/*
+========================================
+CSS Variables for Theming (Light & Dark)
+========================================
+*/
+:root[data-theme='light'] {
+    --background: #f1f5f9; /* slate-100 */
+    --foreground: #020617; /* slate-950 */
+    --card: #ffffff;
+    --card-foreground: #020617;
+    --muted: #f1f5f9; /* slate-100 */
+    --muted-foreground: #64748b; /* slate-500 */
+    --primary: #4f46e5; /* indigo-600 */
+    --primary-foreground: #ffffff;
+    --border: #e2e8f0; /* slate-200 */
+    --sidebar-bg: #ffffff;
+    --sidebar-fg: #334155; /* slate-700 */
+    --sidebar-active-bg: #eef2ff; /* indigo-50 */
+    --sidebar-active-fg: #4f46e5; /* indigo-600 */
+    --topbar-bg: #ffffff;
+}
+
+:root[data-theme='dark'] {
+    --background: #0f172a; /* slate-900 */
+    --foreground: #f8fafc; /* slate-50 */
+    --card: #1e293b; /* slate-800 */
+    --card-foreground: #f8fafc;
+    --muted: #1e293b; /* slate-800 */
+    --muted-foreground: #94a3b8; /* slate-400 */
+    --primary: #6366f1; /* indigo-500 */
+    --primary-foreground: #ffffff;
+    --border: #334155; /* slate-700 */
+    --sidebar-bg: #1e293b;
+    --sidebar-fg: #cbd5e1; /* slate-300 */
+    --sidebar-active-bg: #3730a3; /* indigo-800 */
+    --sidebar-active-fg: #ffffff;
+    --topbar-bg: #1e293b;
+}
+
+/*
+========================================
+Base Body & Typography
+========================================
+*/
+body {
+    font-family: 'Cairo', sans-serif;
+    background-color: var(--background);
+    color: var(--foreground);
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/*
+========================================
+Main Layout Structure
+========================================
+*/
+.page-wrapper {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    transition: grid-template-columns 0.3s ease;
+}
+
+.sidebar {
+    background-color: var(--sidebar-bg);
+    border-left: 1px solid var(--border);
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    transition: width 0.3s ease, padding 0.3s;
+    overflow: hidden;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    height: 100vh;
+}
+
+.page-body {
+    padding: 1.5rem;
+}
+
+/*
+========================================
+Sidebar Styles
+========================================
+*/
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem;
+    height: 65px;
+    flex-shrink: 0;
+}
+
+.logo-icon {
+    width: 2rem;
+    height: 2rem;
+    color: var(--primary);
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-right: 0.75rem;
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+.sidebar-nav {
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    color: var(--sidebar-fg);
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+    .nav-link:hover {
+        background-color: var(--muted);
+    }
+
+    .nav-link.active {
+        background-color: var(--sidebar-active-bg);
+        color: var(--sidebar-active-fg);
+    }
+
+    .nav-link i {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-left: 0.75rem;
+    }
+
+.link-text {
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+/* Collapsed Sidebar Styles (Desktop) */
+.page-wrapper.sidebar-collapsed {
+    grid-template-columns: 80px 1fr;
+}
+
+    .page-wrapper.sidebar-collapsed .sidebar {
+        align-items: center;
+    }
+
+    .page-wrapper.sidebar-collapsed .logo-text,
+    .page-wrapper.sidebar-collapsed .link-text {
+        opacity: 0;
+        width: 0;
+        pointer-events: none;
+    }
+
+    .page-wrapper.sidebar-collapsed .nav-link {
+        justify-content: center;
+    }
+
+/*
+========================================
+Topbar Styles
+========================================
+*/
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1.5rem;
+    height: 65px;
+    background-color: var(--topbar-bg);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.sidebar-toggler {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    color: var(--muted-foreground);
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+    .sidebar-toggler:hover {
+        background-color: var(--muted);
+        color: var(--foreground);
+    }
+
+.theme-toggler {
+    color: var(--muted-foreground);
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0.5rem;
+}
+
+[data-theme='light'] .icon-dark {
+    display: block;
+}
+
+[data-theme='light'] .icon-light {
+    display: none;
+}
+
+[data-theme='dark'] .icon-dark {
+    display: none;
+}
+
+[data-theme='dark'] .icon-light {
+    display: block;
+}
+
+/*
+========================================
+Mobile & Tablet Responsive Styles
+========================================
+*/
+@media (max-width: 1024px) {
+    .page-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100%;
+        width: 280px;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        z-index: 100;
+    }
+
+    .page-wrapper.sidebar-visible .sidebar {
+        transform: translateX(0);
+    }
+
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+        z-index: 99;
+    }
+
+    .page-wrapper.sidebar-visible .overlay {
+        opacity: 1;
+        visibility: visible;
+    }
+}
