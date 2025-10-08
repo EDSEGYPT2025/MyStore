@@ -2,52 +2,62 @@
 @model MyStore.Pages.Admin.Stores.CreateModel
 @{
     ViewData["Title"] = "إضافة متجر جديد";
-    Layout = "_AdminLayout"; // Use the admin layout
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
 }
 
-<div class="container-fluid px-4">
-    <h1 class="mt-4">@ViewData["Title"]</h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a asp-page="/Admin/Stores/Index">إدارة المتاجر</a></li>
-        <li class="breadcrumb-item active">إضافة متجر</li>
-    </ol>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-0">@ViewData["Title"]</h1>
+        <p class="text-muted small mb-0">قم بملء البيانات التالية لإنشاء سجل لمتجر جديد في النظام.</p>
+    </div>
+    <a asp-page="./Index" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-right me-2"></i>العودة لقائمة المتاجر
+    </a>
+</div>
 
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-plus-circle me-1"></i>
-            بيانات المتجر الجديد
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <form method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0 d-flex align-items-center">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    بيانات المتجر الجديد
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
 
-                        <div class="form-floating mb-3">
-                            <input asp-for="Input.Name" class="form-control" placeholder="اسم المتجر" />
-                            <label asp-for="Input.Name"></label>
-                            <span asp-validation-for="Input.Name" class="text-danger"></span>
-                        </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.Name" class="form-control" placeholder="اسم المتجر" />
+                        <label asp-for="Input.Name"></label>
+                        <span asp-validation-for="Input.Name" class="text-danger small"></span>
+                    </div>
 
-                        <div class="form-floating mb-3">
-                            <input asp-for="Input.OwnerName" class="form-control" placeholder="اسم المالك" />
-                            <label asp-for="Input.OwnerName"></label>
-                            <span asp-validation-for="Input.OwnerName" class="text-danger"></span>
-                        </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.OwnerName" class="form-control" placeholder="اسم المالك" />
+                        <label asp-for="Input.OwnerName"></label>
+                        <span asp-validation-for="Input.OwnerName" class="text-danger small"></span>
+                    </div>
 
-                        <div class="form-floating mb-3">
-                            <input asp-for="Input.OwnerPhone" class="form-control" placeholder="رقم هاتف المالك" />
-                            <label asp-for="Input.OwnerPhone"></label>
-                            <span asp-validation-for="Input.OwnerPhone" class="text-danger"></span>
-                        </div>
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.OwnerPhone" class="form-control" placeholder="رقم هاتف المالك" />
+                        <label asp-for="Input.OwnerPhone"></label>
+                        <span asp-validation-for="Input.OwnerPhone" class="text-danger small"></span>
+                    </div>
 
-                        <div class="mt-4">
-                            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>حفظ وإنشاء المتجر</button>
-                            <a asp-page="Index" class="btn btn-secondary">إلغاء</a>
-                        </div>
-                    </form>
-                </div>
+                    <div class="mt-4 d-flex justify-content-end">
+                        <a asp-page="Index" class="btn btn-secondary me-2">إلغاء</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>حفظ وإنشاء المتجر
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

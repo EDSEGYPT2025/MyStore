@@ -1,7 +1,6 @@
-﻿
-document.addEventListener('DOMContentLoaded', function () {
+﻿document.addEventListener('DOMContentLoaded', function () {
     // --- CONFIGURATION & STATE ---
-    const WHATSAPP_NUMBER = "201010475455";
+    const WHATSAPP_NUMBER = "201010475455"; // Your WhatsApp number
     let cart = [];
 
     // --- SELECTORS ---
@@ -11,17 +10,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const productDetailsModalEl = document.getElementById('productDetailsModal');
     const productDetailsModal = productDetailsModalEl ? new bootstrap.Modal(productDetailsModalEl) : null;
 
+    // Common Selectors for both views
+    const allProductWrappers = document.querySelectorAll('.product-card-wrapper');
+    const allCompanyButtons = document.querySelectorAll('.company-card-btn');
+
     // Desktop
-    const desktopProductWrappers = document.querySelectorAll('#products-list-desktop .product-card-wrapper');
-    const desktopCompanyButtons = document.querySelectorAll('#companies-section-desktop .company-card-btn');
     const desktopSearchInput = document.getElementById('product-search-input-desktop');
     const desktopCartContainer = document.getElementById('cart-items-desktop');
     const desktopCartTotal = document.getElementById('cart-total-desktop');
     const desktopEmptyMsg = document.querySelector('#cart-sidebar .cart-empty-msg');
 
     // Mobile
-    const mobileProductWrappers = document.querySelectorAll('#products-list-mobile .product-card-wrapper');
-    const mobileCompanyButtons = document.querySelectorAll('#companies-section-mobile .company-card-btn');
     const mobileSearchInput = document.getElementById('product-search-input-mobile');
     const mobileCartContainer = document.getElementById('cart-items-mobile');
     const mobileCartTotal = document.getElementById('cart-total-mobile');
@@ -31,22 +30,19 @@ document.addEventListener('DOMContentLoaded', function () {
     const mobileCartCount = document.getElementById('bottom-nav-cart-count');
     const mobileCartFooter = document.querySelector('.cart-footer-mobile');
 
-    // --- FUNCTIONS ---
+    // --- CORE FUNCTIONS (Cart, Modals, Order) ---
 
     function showProductDetails(productData) {
         if (!productDetailsModalEl) return;
-
         document.getElementById('modal-product-image').src = productData.image;
         document.getElementById('modal-product-name').textContent = productData.name;
         document.getElementById('modal-product-description').textContent = productData.description;
         document.getElementById('modal-product-price').textContent = `${parseFloat(productData.price).toFixed(2)} جنيه`;
-
         const modalAddToCartBtn = document.getElementById('modal-add-to-cart-btn');
         modalAddToCartBtn.dataset.productId = productData.id;
         modalAddToCartBtn.dataset.productName = productData.name;
         modalAddToCartBtn.dataset.productPrice = productData.price;
         modalAddToCartBtn.dataset.productImage = productData.image;
-
         productDetailsModal.show();
     }
 
@@ -63,13 +59,11 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateQuantity(productId, action) {
         const itemIndex = cart.findIndex(item => item.id === productId);
         if (itemIndex === -1) return;
-
         if (action === 'increment') cart[itemIndex].quantity++;
         else if (action === 'decrement') {
             cart[itemIndex].quantity--;
             if (cart[itemIndex].quantity <= 0) cart.splice(itemIndex, 1);
         } else if (action === 'remove') cart.splice(itemIndex, 1);
-
         updateCartDisplay();
     }
 
@@ -88,7 +82,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             </div>`).join('') : '';
 
-        // Update Desktop
         if (desktopCartContainer) {
             desktopCartContainer.innerHTML = cartHtml;
             desktopCartTotal.textContent = total.toFixed(2);
@@ -96,14 +89,12 @@ document.addEventListener('DOMContentLoaded', function () {
             if (desktopEmptyMsg) desktopEmptyMsg.style.display = hasItems ? 'none' : 'block';
         }
 
-        // Update Mobile
         if (mobileCartContainer) {
             mobileCartContainer.innerHTML = cartHtml;
             mobileCartTotal.textContent = total.toFixed(2);
             document.querySelectorAll('.app-shell .checkout-btn').forEach(btn => btn.disabled = !hasItems);
             if (mobileEmptyMsg) mobileEmptyMsg.style.display = hasItems ? 'none' : 'block';
             if (mobileCartCount) mobileCartCount.textContent = totalItems;
-
             const cartViewIsActive = document.getElementById('view-cart')?.classList.contains('active');
             if (mobileCartFooter) mobileCartFooter.style.display = (cartViewIsActive && hasItems) ? 'block' : 'none';
         }
@@ -116,10 +107,8 @@ document.addEventListener('DOMContentLoaded', function () {
             checkoutForm.classList.add('was-validated');
             return;
         }
-
         confirmOrderBtn.disabled = true;
         confirmOrderBtn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> جارٍ التأكيد...`;
-
         const orderData = {
             customerName: document.getElementById('customer-name').value,
             customerPhone: document.getElementById('customer-phone').value,
@@ -127,7 +116,6 @@ document.addEventListener('DOMContentLoaded', function () {
             cartItems: cart.map(item => ({ id: item.id, quantity: item.quantity })),
             storeId: parseInt(currentStoreIdInput.value)
         };
-
         try {
             const response = await fetch(`${window.location.pathname}?handler=CreateOrder`, {
                 method: 'POST',
@@ -156,6 +144,21 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // --- FILTER & SEARCH ---
+    function filterAndSearch() {
+        const activeCompanyBtn = document.querySelector('.company-card-btn.active');
+        const companyId = activeCompanyBtn ? activeCompanyBtn.dataset.companyId : '0';
+        const desktopQuery = desktopSearchInput ? desktopSearchInput.value.toLowerCase() : '';
+        const mobileQuery = mobileSearchInput ? mobileSearchInput.value.toLowerCase() : '';
+        const currentQuery = window.innerWidth >= 992 ? desktopQuery : mobileQuery;
+
+        allProductWrappers.forEach(card => {
+            const companyMatch = companyId === '0' || card.dataset.companyId === companyId;
+            const nameMatch = card.dataset.productName.toLowerCase().includes(currentQuery);
+            card.style.display = companyMatch && nameMatch ? 'block' : 'none';
+        });
+    }
+
     // --- EVENT LISTENERS ---
 
     document.body.addEventListener('click', function (e) {
@@ -164,19 +167,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (addToCartBtn) {
             e.stopPropagation();
-
-            let productDataContainer = addToCartBtn.closest('.product-card-wrapper');
-            if (addToCartBtn.id === 'modal-add-to-cart-btn') {
-                productDataContainer = addToCartBtn;
-            }
-
+            let productDataContainer = addToCartBtn.closest('.product-card-wrapper') || addToCartBtn;
             const product = {
                 id: parseInt(productDataContainer.dataset.productId),
                 name: productDataContainer.dataset.productName,
                 price: parseFloat(productDataContainer.dataset.productPrice),
                 imageUrl: productDataContainer.dataset.productImage
             };
-
             if (product.id) {
                 addToCart(product);
                 if (addToCartBtn.id === 'modal-add-to-cart-btn') {
@@ -184,14 +181,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     addToCartBtn.innerHTML = '<i class="fas fa-check"></i>';
                     setTimeout(() => {
-                        const originalIcon = '<i class="fas fa-cart-plus me-1"></i>';
-                        const buttonText = addToCartBtn.textContent.includes("إضافة") ? ' إضافة للسلة' : '';
-                        addToCartBtn.innerHTML = originalIcon + buttonText;
+                        const originalContent = addToCartBtn.closest('.product-card-wrapper') ? '<i class="fas fa-cart-plus"></i>' : '<i class="fas fa-cart-plus me-1"></i> إضافة للسلة';
+                        addToCartBtn.innerHTML = originalContent;
                     }, 1000);
                 }
             }
-        }
-        else if (productCardWrapper) {
+        } else if (productCardWrapper) {
             const productData = {
                 id: parseInt(productCardWrapper.dataset.productId),
                 name: productCardWrapper.dataset.productName,
@@ -199,9 +194,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 image: productCardWrapper.dataset.productImage,
                 description: productCardWrapper.dataset.productDescription
             };
-            if (productData.id) {
-                showProductDetails(productData);
-            }
+            if (productData.id) showProductDetails(productData);
         }
 
         const qtyBtn = e.target.closest('.qty-btn');
@@ -227,64 +220,41 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // --- FILTERING AND SEARCH ---
-
-    // Desktop Filtering
-    desktopCompanyButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            desktopCompanyButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            const companyId = button.dataset.companyId;
-            desktopProductWrappers.forEach(card => {
-                card.style.display = (companyId === '0' || card.dataset.companyId === companyId) ? 'block' : 'none';
-            });
+    // Company/Brand Filter Buttons
+    allCompanyButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const companyId = this.dataset.companyId;
+            allCompanyButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll(`.company-card-btn[data-company-id="${companyId}"]`).forEach(btn => btn.classList.add('active'));
+            filterAndSearch();
         });
     });
 
-    // === الإصلاح النهائي هنا ===
-    // Mobile Filtering
-    if (mobileCompanyButtons) {
-        mobileCompanyButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                mobileCompanyButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
-                const selectedCompanyId = button.dataset.companyId;
+    // Search Input Listeners
+    desktopSearchInput?.addEventListener('input', filterAndSearch);
+    mobileSearchInput?.addEventListener('input', filterAndSearch);
 
-                mobileProductWrappers.forEach(card => {
-                    // Correct comparison
-                    card.style.display = (selectedCompanyId === '0' || card.dataset.companyId === selectedCompanyId) ? 'block' : 'none';
-                });
+    // --- MANUAL CAROUSEL SCROLLING LOGIC ---
+    function setupCarousel(containerId, prevBtnId, nextBtnId) {
+        const container = document.getElementById(containerId);
+        const prevBtn = document.getElementById(prevBtnId);
+        const nextBtn = document.getElementById(nextBtnId);
 
-                // Switch back to the home view to see the filtered results
-                document.querySelector('.nav-btn[data-view="view-home"]').click();
+        if (container && prevBtn && nextBtn) {
+            const scrollAmount = 300;
+
+            nextBtn.addEventListener('click', () => {
+                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
             });
-        });
-    }
 
-    // Desktop Search
-    if (desktopSearchInput) {
-        desktopSearchInput.addEventListener('input', () => {
-            const query = desktopSearchInput.value.toLowerCase();
-            desktopProductWrappers.forEach(card => {
-                const name = card.dataset.productName.toLowerCase();
-                card.style.display = name.includes(query) ? 'block' : 'none';
+            prevBtn.addEventListener('click', () => {
+                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
             });
-        });
-    }
-
-    // Mobile Search
-    if (mobileSearchInput) {
-        mobileSearchInput.addEventListener('input', () => {
-            const query = mobileSearchInput.value.toLowerCase();
-            mobileProductWrappers.forEach(card => {
-                const name = card.dataset.productName.toLowerCase();
-                card.style.display = name.includes(query) ? 'block' : 'none';
-            });
-        });
+        }
     }
 
     // --- INITIALIZATION ---
     updateCartDisplay();
+    setupCarousel('brands-scroll-desktop', 'scroll-prev-desktop', 'scroll-next-desktop');
+    setupCarousel('brands-scroll-mobile', 'scroll-prev-mobile', 'scroll-next-mobile');
 });
-
-

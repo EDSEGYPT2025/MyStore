@@ -1,47 +1,93 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Bogus;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using MyStore.Models;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MyStore.Data
 {
     public static class DbInitializer
     {
-        public static async Task SeedRolesAndAdminAsync(IServiceProvider services)
+        public static async Task SeedRolesAndAdminAsync(IServiceProvider serviceProvider)
         {
-            var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            // --- قائمة الأدوار التي يجب أن تكون موجودة في النظام ---
-            string[] roleNames = { "Admin", "StoreManager" };
-
-            foreach (var roleName in roleNames)
+            // Seed Roles
+            if (!await roleManager.RoleExistsAsync("Admin"))
             {
-                var roleExist = await roleManager.RoleExistsAsync(roleName);
-                if (!roleExist)
-                {
-                    // أنشئ الدور إذا لم يكن موجودًا
-                    await roleManager.CreateAsync(new IdentityRole(roleName));
-                }
+                await roleManager.CreateAsync(new IdentityRole("Admin"));
+            }
+            if (!await roleManager.RoleExistsAsync("Manager"))
+            {
+                await roleManager.CreateAsync(new IdentityRole("Manager"));
             }
 
-            // --- إنشاء المستخدم المدير الافتراضي ---
-            var adminUser = await userManager.FindByEmailAsync("admin@mystore.com");
-            if (adminUser == null)
+            // Seed Admin User
+            var adminEmail = "admin@mystore.com";
+            if (await userManager.FindByEmailAsync(adminEmail) == null)
             {
-                var newAdminUser = new ApplicationUser
+                var adminUser = new ApplicationUser
                 {
-                    UserName = "admin@mystore.com",
-                    Email = "admin@mystore.com",
+                    UserName = adminEmail,
+                    Email = adminEmail,
                     FullName = "Admin User",
-                    EmailConfirmed = true // تأكيد البريد الإلكتروني تلقائيًا
+                    EmailConfirmed = true
                 };
-                var result = await userManager.CreateAsync(newAdminUser, "Admin_12345");
+                var result = await userManager.CreateAsync(adminUser, "Admin@123");
                 if (result.Succeeded)
                 {
-                    // قم بتعيين دور "Admin" للمستخدم الجديد
-                    await userManager.AddToRoleAsync(newAdminUser, "Admin");
+                    await userManager.AddToRoleAsync(adminUser, "Admin");
                 }
+            }
+        }
+
+        public static async Task SeedStoreDataAsync(ApplicationDbContext context)
+        {
+            var firstStore = await context.Stores.FirstOrDefaultAsync();
+            if (firstStore == null) return;
+
+            // === التحسين: إضافة العدد المتبقي من الماركات ===
+            const int totalCompaniesToSeed = 10;
+            var currentCompanyCount = await context.Companies.CountAsync(c => c.StoreId == firstStore.Id);
+
+            if (currentCompanyCount < totalCompaniesToSeed)
+            {
+                var companiesToGenerate = totalCompaniesToSeed - currentCompanyCount;
+                var companyFaker = new Faker<Company>()
+                    .RuleFor(c => c.Name, f => f.Company.CompanyName())
+                    .RuleFor(c => c.LogoUrl, f => f.Image.PicsumUrl(400, 400, true))
+                    .RuleFor(c => c.StoreId, firstStore.Id);
+
+                var newCompanies = companyFaker.Generate(companiesToGenerate);
+                await context.Companies.AddRangeAsync(newCompanies);
+                await context.SaveChangesAsync();
+            }
+
+            // === التحسين: إضافة العدد المتبقي من المنتجات ===
+            const int totalProductsToSeed = 200;
+            var currentProductCount = await context.Products.CountAsync(p => p.StoreId == firstStore.Id);
+
+            // تأكد من وجود ماركات قبل إضافة المنتجات
+            var storeCompanies = await context.Companies.Where(c => c.StoreId == firstStore.Id).ToListAsync();
+            if (!storeCompanies.Any()) return; // لا تضف منتجات إذا لم تكن هناك ماركات
+
+            if (currentProductCount < totalProductsToSeed)
+            {
+                var productsToGenerate = totalProductsToSeed - currentProductCount;
+                var productFaker = new Faker<Product>("ar")
+                    .RuleFor(p => p.Name, f => f.Commerce.ProductName())
+                    .RuleFor(p => p.Description, f => f.Lorem.Paragraphs(2))
+                    .RuleFor(p => p.Price, f => Math.Round(f.Random.Decimal(50, 5000), 2))
+                    .RuleFor(p => p.ImageUrl, f => f.Image.PicsumUrl(640, 480, true))
+                    .RuleFor(p => p.StoreId, firstStore.Id)
+                    .RuleFor(p => p.CompanyId, f => f.PickRandom(storeCompanies).Id);
+
+                var newProducts = productFaker.Generate(productsToGenerate);
+                await context.Products.AddRangeAsync(newProducts);
+                await context.SaveChangesAsync();
             }
         }
     }
 }
-

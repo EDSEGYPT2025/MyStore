@@ -1,263 +1,151 @@
 ﻿/*
-==================================================
-MyStore - Professional SaaS-like Dashboard Stylesheet
-==================================================
+========================================
+    Admin Layout Variables & Base
+========================================
 */
-
-/* 1. Light Mode Color Variables (Default) */
-/* العربية: متغيرات الألوان للوضع الفاتح (الافتراضي) */
 :root {
-    --primary-50: #eff6ff;
-    --primary-100: #dbeafe;
-    --primary-500: #3b82f6;
-    --primary-600: #2563eb;
-    --background: #f8fafc; /* Very light gray */
-    --foreground: #020817; /* Almost black */
-    --card-background: #ffffff;
-    --card-foreground: #020817;
-    --muted-foreground: #64748b;
-    --border: #e2e8f0;
-    --sidebar-bg: #0f172a; /* Dark slate */
-    --sidebar-foreground: #cbd5e1;
-    --sidebar-active-bg: #1e293b;
-    --sidebar-active-foreground: #ffffff;
-    --sidebar-hover-bg: #1e293b;
+    --sidebar-width: 260px;
+    --topbar-height: 65px;
+    --sidebar-bg: #212529;
+    --sidebar-link-color: #adb5bd;
+    --sidebar-link-hover-color: #ffffff;
+    --sidebar-active-bg: #0d6efd;
+    --content-bg: #f4f6f9;
 }
 
-/* 2. Dark Mode Color Variables */
-/* العربية: متغيرات الألوان للوضع الليلي */
-[data-theme="dark"] {
-    --background: #020817;
-    --foreground: #f8fafc;
-    --card-background: #0f172a;
-    --card-foreground: #f8fafc;
-    --muted-foreground: #94a3b8;
-    --border: #1e293b;
-    --sidebar-bg: #020817; /* Even darker for dark mode */
-    --sidebar-foreground: #94a3b8;
-    --sidebar-active-bg: #1e293b;
-    --sidebar-active-foreground: #ffffff;
-    --sidebar-hover-bg: #1e293b;
-}
-
-/* 3. Global Styles */
-/* العربية: تنسيقات عامة */
 body {
+    background-color: var(--content-bg);
     font-family: 'Cairo', sans-serif;
-    background-color: var(--background);
-    color: var(--foreground);
     overflow-x: hidden;
-    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.page-wrapper, .sidebar, .main-content {
-    transition: all 0.3s ease-in-out;
+/*
+========================================
+    Main Wrapper & Sidebar
+========================================
+*/
+.admin-wrapper {
+    padding-right: var(--sidebar-width); /* Push content to the right of sidebar */
+    transition: padding-right 0.3s ease;
 }
 
-/* 4. Sidebar */
-/* العربية: تنسيقات القائمة الجانبية */
 .sidebar {
-    width: 260px;
-    background-color: var(--sidebar-bg);
-    color: var(--sidebar-foreground);
     position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
-    z-index: 1001;
+    width: var(--sidebar-width);
+    z-index: 1030; /* Higher than navbar */
+    box-shadow: 0 0 1rem rgba(0,0,0,.1);
+    background-color: var(--sidebar-bg);
+    transition: transform 0.3s ease;
 }
 
-.sidebar-header {
-    padding: 1.5rem;
+.sidebar-brand {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid var(--border);
+    justify-content: center;
+    height: var(--topbar-height);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+    background-color: rgba(0,0,0,0.2);
 }
 
-    .sidebar-header .logo-text {
-        font-weight: 700;
-        font-size: 1.25rem;
-        opacity: 1;
-        transition: opacity 0.2s ease;
-        white-space: nowrap;
+    .sidebar-brand i {
+        margin-left: 10px;
     }
 
 .sidebar-nav {
-    padding: 1rem 0.75rem;
+    height: calc(100vh - var(--topbar-height));
+    overflow-y: auto;
+    padding-top: 1rem;
 }
 
-    .sidebar-nav .nav-link {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.75rem 1rem;
-        border-radius: 0.5rem;
-        margin-bottom: 0.25rem;
-        color: var(--sidebar-foreground);
-        text-decoration: none;
-    }
-
-        .sidebar-nav .nav-link:hover {
-            background-color: var(--sidebar-hover-bg);
-            color: var(--sidebar-active-foreground);
-        }
-
-        .sidebar-nav .nav-link.active {
-            background-color: var(--sidebar-active-bg);
-            color: var(--sidebar-active-foreground);
-            font-weight: 600;
-        }
-
-    .sidebar-nav .link-text {
-        opacity: 1;
-        transition: opacity 0.2s ease;
-        white-space: nowrap;
-    }
-
-/* 5. Main Content & Topbar */
-/* العربية: تنسيقات المحتوى الرئيسي والشريط العلوي */
-.main-content {
-    margin-right: 260px;
+/*
+========================================
+    Navigation Links
+========================================
+*/
+.sidebar .nav-link {
+    font-weight: 500;
+    color: var(--sidebar-link-color);
+    display: flex;
+    align-items: center;
+    padding: 0.85rem 1.5rem;
+    transition: all 0.2s ease-in-out;
+    border-right: 3px solid transparent;
 }
 
+    .sidebar .nav-link .fa-fw {
+        width: 1.5em;
+        margin-left: 0.5rem;
+    }
+
+    .sidebar .nav-link:hover {
+        color: var(--sidebar-link-hover-color);
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .sidebar .nav-link.active {
+        color: #fff;
+        background-color: var(--sidebar-active-bg);
+        border-right-color: #66b0ff;
+    }
+
+/*
+========================================
+    Topbar & Main Content
+========================================
+*/
 .topbar {
-    background-color: var(--card-background);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 999;
+    height: var(--topbar-height);
+    background-color: #fff;
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.75rem 1.5rem;
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 1020;
 }
 
-.sidebar-toggler, .theme-toggler {
-    color: var(--muted-foreground);
-    background: transparent;
-    border: none;
-    padding: 0.5rem;
-    border-radius: 9999px;
-}
-
-    .sidebar-toggler:hover, .theme-toggler:hover {
-        color: var(--foreground);
-        background-color: var(--background);
-    }
-
-.page-body {
+.main-content {
     padding: 2rem;
 }
 
-/* 6. Collapsed Sidebar State */
-/* العربية: حالة القائمة الجانبية المصغرة */
-.sidebar-collapsed .sidebar {
-    width: 80px;
-}
+/*
+========================================
+    Responsive Design (Mobile & Tablet)
+========================================
+*/
+@media (max-width: 991.98px) {
+    .admin-wrapper {
+        padding-right: 0;
+    }
 
-.sidebar-collapsed .main-content {
-    margin-right: 80px;
-}
-
-.sidebar-collapsed .sidebar-header .logo-text,
-.sidebar-collapsed .sidebar-nav .link-text {
-    opacity: 0;
-    pointer-events: none;
-}
-
-/* 7. Responsive & Overlay */
-/* العربية: تنسيقات التجاوب والطبقة المعتمة */
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease;
-}
-
-@@media (max-width: 1023.98px) {
     .sidebar {
-        transform: translateX(260px); /* Hides sidebar to the right for RTL */
+        transform: translateX(var(--sidebar-width)); /* Hide sidebar off-screen */
     }
 
-    .main-content {
-        margin-right: 0;
+        .sidebar.is-open {
+            transform: translateX(0); /* Show sidebar */
+        }
+
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1029;
+        display: none;
     }
 
-    .page-wrapper.sidebar-visible .sidebar {
-        transform: translateX(0);
+    .sidebar.is-open + .sidebar-overlay {
+        display: block;
     }
-
-    .page-wrapper.sidebar-visible .overlay {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    .sidebar-collapsed .sidebar {
-        width: 260px; /* On mobile, collapsed state is same as open */
-    }
-
-    .sidebar-collapsed .main-content {
-        margin-right: 0;
-    }
-
-    .sidebar-collapsed .sidebar-header .logo-text,
-    .sidebar-collapsed .sidebar-nav .link-text {
-        opacity: 1;
-    }
-}
-
-/* 8. Component Styles */
-/* العربية: تنسيقات المكونات */
-.card {
-    background-color: var(--card-background);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    border-radius: 0.75rem;
-}
-
-.card-header, .card-footer {
-    background-color: transparent;
-    border-color: var(--border);
-}
-
-.table {
-    color: var(--foreground);
-}
-
-.table-hover > tbody > tr:hover {
-    color: var(--foreground);
-    background-color: var(--border);
-}
-
-[data-theme="dark"] .table-hover > tbody > tr:hover {
-    background-color: #1e293b;
-}
-
-/* Lucide Icon Sizing */
-[data-lucide] {
-    width: 20px;
-    height: 20px;
-}
-
-/* Theme Toggler Icon visibility */
-.theme-toggler .icon-light {
-    display: none;
-}
-
-.theme-toggler .icon-dark {
-    display: block;
-}
-
-[data-theme="dark"] .theme-toggler .icon-light {
-    display: block;
-}
-
-[data-theme="dark"] .theme-toggler .icon-dark {
-    display: none;
 }

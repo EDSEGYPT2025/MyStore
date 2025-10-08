@@ -5,57 +5,53 @@
     Layout = "~/Pages/Shared/_ManagerLayout.cshtml";
 }
 
-<!--
-    English: Main header for the dashboard.
-    العربية: الترويسة الرئيسية للداشبورد
--->
 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
     <div>
         <h1 class="text-2xl lg:text-3xl font-bold text-foreground">لوحة التحكم</h1>
         <p class="text-muted-foreground mt-1">أهلاً بعودتك، @Model.CurrentStore.OwnerName!</p>
     </div>
-    <a asp-page="/Manager/Products/Create" class="btn btn-primary inline-flex items-center gap-2">
-        <i data-lucide="plus" class="w-4 h-4"></i>
+    <a asp-page="/Manager/Products/Create" class="inline-flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground font-semibold rounded-lg shadow-sm hover:bg-primary/90 transition-colors">
+        <i data-lucide="plus" class="w-4 h-4 me-2"></i>
         <span>إضافة منتج جديد</span>
     </a>
 </div>
 
-<!--
-    English: Statistics cards section. These are clickable and lead to relevant pages.
-    العربية: قسم بطاقات الإحصائيات. هذه البطاقات قابلة للنقر وتؤدي إلى الصفحات ذات الصلة
--->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-    <!-- Products Card -->
-    <a asp-page="/Manager/Products/Index" class="card-link no-underline">
-        <div class="card p-4 flex flex-row items-center gap-4 hover:border-primary-500">
-            <div class="bg-primary-50 text-primary-600 rounded-full p-3"><i data-lucide="package" class="w-8 h-8"></i></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <a asp-page="/Manager/Products/Index" class="group block">
+        <div class="bg-card text-card-foreground rounded-xl border shadow-sm p-5 flex items-center gap-5 transition-all group-hover:border-primary group-hover:shadow-lg">
+            <div class="bg-primary/10 text-primary rounded-full p-3">
+                <i data-lucide="package" class="w-8 h-8"></i>
+            </div>
             <div>
                 <p class="text-muted-foreground">المنتجات</p>
                 <h3 class="text-3xl font-bold">@Model.ProductCount</h3>
             </div>
         </div>
     </a>
-    <!-- Orders Card -->
-    <a asp-page="/Manager/Orders/Index" class="card-link no-underline">
-        <div class="card p-4 flex flex-row items-center gap-4 hover:border-green-500">
-            <div class="bg-green-100 text-green-600 rounded-full p-3"><i data-lucide="receipt" class="w-8 h-8"></i></div>
+    <a asp-page="/Manager/Orders/Index" class="group block">
+        <div class="bg-card text-card-foreground rounded-xl border shadow-sm p-5 flex items-center gap-5 transition-all group-hover:border-green-500 group-hover:shadow-lg">
+            <div class="bg-green-500/10 text-green-600 rounded-full p-3">
+                <i data-lucide="receipt" class="w-8 h-8"></i>
+            </div>
             <div>
                 <p class="text-muted-foreground">الطلبات</p>
                 <h3 class="text-3xl font-bold">@Model.OrderCount</h3>
             </div>
         </div>
     </a>
-    <!-- Dummy Visits Card -->
-    <div class="card p-4 flex flex-row items-center gap-4">
-        <div class="bg-yellow-100 text-yellow-600 rounded-full p-3"><i data-lucide="bar-chart-3" class="w-8 h-8"></i></div>
+    <div class="bg-card text-card-foreground rounded-xl border shadow-sm p-5 flex items-center gap-5">
+        <div class="bg-yellow-500/10 text-yellow-600 rounded-full p-3">
+            <i data-lucide="bar-chart-3" class="w-8 h-8"></i>
+        </div>
         <div>
             <p class="text-muted-foreground">الزيارات</p>
             <h3 class="text-3xl font-bold">2,150</h3>
         </div>
     </div>
-    <!-- Dummy Rating Card -->
-    <div class="card p-4 flex flex-row items-center gap-4">
-        <div class="bg-red-100 text-red-600 rounded-full p-3"><i data-lucide="star" class="w-8 h-8"></i></div>
+    <div class="bg-card text-card-foreground rounded-xl border shadow-sm p-5 flex items-center gap-5">
+        <div class="bg-red-500/10 text-red-600 rounded-full p-3">
+            <i data-lucide="star" class="w-8 h-8"></i>
+        </div>
         <div>
             <p class="text-muted-foreground">التقييم</p>
             <h3 class="text-3xl font-bold">4.8</h3>
@@ -63,44 +59,38 @@
     </div>
 </div>
 
-<!--
-    English: Main content grid with Sales Chart and Recent Orders table.
-    العربية: الشبكة الرئيسية للمحتوى مع الرسم البياني للمبيعات وجدول أحدث الطلبات
--->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="lg:col-span-2 card">
-        <div class="card-header"><h6 class="font-bold">نظرة عامة على المبيعات</h6></div>
-        <div class="card-body">
+    @*<div class="lg:col-span-2 bg-card text-card-foreground rounded-xl border shadow-sm">
+        <div class="p-4 border-b">
+            <h6 class="font-semibold">نظرة عامة على المبيعات</h6>
+        </div>
+        <div class="p-4">
             <canvas id="myAreaChart" style="height: 320px;"></canvas>
         </div>
-    </div>
-    <div class="card">
-        <div class="card-header flex justify-between items-center">
-            <h6 class="font-bold">أحدث الطلبات</h6>
-            <a asp-page="/Manager/Orders/Index" class="text-sm text-primary-600 hover:underline">عرض الكل</a>
+    </div>*@
+    <div class="bg-card text-card-foreground rounded-xl border shadow-sm">
+        <div class="p-4 border-b flex justify-between items-center">
+            <h6 class="font-semibold">أحدث الطلبات</h6>
+            <a asp-page="/Manager/Orders/Index" class="text-sm text-primary hover:underline">عرض الكل</a>
         </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <tbody>
-                        @if (Model.RecentOrders.Any())
-                        {
-                            @foreach (var order in Model.RecentOrders)
-                            {
-                                <tr>
-                                    <td class="p-4"><a asp-page="/Manager/Orders/Details" asp-route-id="@order.Id" class="hover:underline font-semibold">@order.OrderNumber</a></td>
-                                    <td class="p-4 text-muted-foreground">@order.CustomerName</td>
-                                    <td class="p-4 text-green-600 font-bold">@order.TotalAmount.ToString("N2") ج.م</td>
-                                </tr>
-                            }
-                        }
-                        else
-                        {
-                            <tr><td colspan="3" class="text-center p-4 text-muted-foreground">لا توجد طلبات حديثة.</td></tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+        <div class="divide-y divide-border">
+            @if (Model.RecentOrders.Any())
+            {
+                foreach (var order in Model.RecentOrders)
+                {
+                    <div class="p-4 flex justify-between items-center hover:bg-muted/50 transition-colors">
+                        <div>
+                            <a asp-page="/Manager/Orders/Details" asp-route-id="@order.Id" class="font-semibold text-foreground hover:underline">@order.OrderNumber</a>
+                            <p class="text-sm text-muted-foreground">@order.CustomerName</p>
+                        </div>
+                        <div class="text-green-600 font-bold">@order.TotalAmount.ToString("N2") ج.م</div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="p-6 text-center text-muted-foreground">لا توجد طلبات حديثة.</div>
+            }
         </div>
     </div>
 </div>
@@ -136,4 +126,3 @@
         });
     </script>
 }
-

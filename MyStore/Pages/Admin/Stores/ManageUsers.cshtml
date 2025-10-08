@@ -6,38 +6,42 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3">@ViewData["Title"]</h1>
+    <div>
+        <h1 class="h3 mb-0">@ViewData["Title"]</h1>
+        <p class="text-muted small mb-0">إضافة مدراء جدد أو عرض المستخدمين الحاليين للمتجر.</p>
+    </div>
     <a asp-page="./Index" class="btn btn-outline-secondary">
         <i class="fas fa-arrow-right me-2"></i>العودة لقائمة المتاجر
     </a>
 </div>
 
 <div class="row">
-    <!-- قائمة المستخدمين الحاليين -->
     <div class="col-lg-7">
-        <div class="card shadow-sm">
-            <div class="card-header">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header border-0">
                 <h5 class="mb-0">المستخدمون الحاليون</h5>
             </div>
-            <div class="card-body p-0">
+            <div class="table-responsive">
                 @if (Model.StoreUsers.Any())
                 {
-                    <table class="table table-hover mb-0">
+                    <table class="table table-hover table-nowrap mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th>الاسم الكامل</th>
-                                <th>البريد الإلكتروني</th>
-                                <th></th>
+                                <th scope="col">الاسم الكامل</th>
+                                <th scope="col">البريد الإلكتروني</th>
+                                <th scope="col" class="text-end">الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var user in Model.StoreUsers)
                             {
                                 <tr>
-                                    <td>@user.FullName</td>
-                                    <td>@user.Email</td>
-                                    <td class="text-end">
-                                        @* يمكنك إضافة أزرار للتعديل أو الحذف هنا مستقبلًا *@
+                                    <td class="align-middle">@user.FullName</td>
+                                    <td class="align-middle text-muted">@user.Email</td>
+                                    <td class="text-end align-middle">
+                                        <a href="#" class="btn btn-sm btn-outline-danger" title="حذف المستخدم">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
                                     </td>
                                 </tr>
                             }
@@ -46,45 +50,47 @@
                 }
                 else
                 {
-                    <div class="p-4 text-center text-muted">
-                        <i class="fas fa-users-slash fa-2x mb-3"></i>
-                        <p>لا يوجد مستخدمون مضافون لهذا المتجر بعد.</p>
+                    <div class="p-5 text-center text-muted">
+                        <i class="fas fa-users-slash fa-3x mb-3"></i>
+                        <p class="mb-0">لا يوجد مستخدمون مضافون لهذا المتجر بعد.</p>
                     </div>
                 }
             </div>
         </div>
     </div>
 
-    <!-- فورم إضافة مستخدم جديد -->
     <div class="col-lg-5">
         <div class="card shadow-sm">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="fas fa-user-plus me-2"></i>إضافة مدير جديد للمتجر</h5>
+                <h5 class="mb-0 d-flex align-items-center">
+                    <i class="fas fa-user-plus me-2"></i>
+                    إضافة مدير جديد للمتجر
+                </h5>
             </div>
-            <div class="card-body">
+            <div class="card-body p-4">
                 <form method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                     <input type="hidden" asp-for="Input.StoreId" />
 
                     <div class="mb-3">
                         <label asp-for="Input.FullName" class="form-label"></label>
-                        <input asp-for="Input.FullName" class="form-control" />
+                        <input asp-for="Input.FullName" class="form-control" placeholder="مثال: أحمد محمد" />
                         <span asp-validation-for="Input.FullName" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="Input.Email" class="form-label"></label>
-                        <input asp-for="Input.Email" class="form-control" />
+                        <input asp-for="Input.Email" type="email" class="form-control" placeholder="example@store.com" />
                         <span asp-validation-for="Input.Email" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="Input.Password" class="form-label"></label>
-                        <input asp-for="Input.Password" class="form-control" />
+                        <input asp-for="Input.Password" type="password" class="form-control" placeholder="••••••••" />
                         <span asp-validation-for="Input.Password" class="text-danger"></span>
                     </div>
 
-                    <div class="d-grid">
+                    <div class="d-grid mt-4">
                         <button type="submit" class="btn btn-primary btn-lg">
                             <i class="fas fa-save me-2"></i>حفظ وإنشاء الحساب
                         </button>
@@ -94,3 +100,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -13,228 +13,65 @@
     <title>@ViewData["Title"]</title>
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
     <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
-
-    <!-- === CSS مخصص لتحقيق مظهر App Shell الاحترافي === -->
-    <style>
-        :root {
-            --primary-color: #007bff;
-            --surface-color: #ffffff;
-            --background-color: #f4f7f9;
-            --border-color: #dee2e6;
-        }
-
-        body {
-            font-family: 'Cairo', sans-serif;
-        }
-
-        .app-shell {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-            background-color: var(--background-color);
-        }
-
-        .app-main {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding-bottom: 70px;
-        }
-
-        .app-view {
-            display: none;
-        }
-
-            .app-view.active {
-                display: block;
-            }
-
-        .app-view-header {
-            background-color: var(--surface-color);
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-            .app-view-header h1 {
-                font-size: 1.25rem;
-                font-weight: 700;
-                margin: 0;
-            }
-
-        .app-view-content {
-            padding: 1rem;
-        }
-
-        .app-bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 65px;
-            background-color: var(--surface-color);
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-around;
-            z-index: 1000;
-        }
-
-        .nav-btn {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            flex-grow: 1;
-            background: none;
-            border: none;
-            color: #6c757d;
-            font-size: 0.7rem;
-            position: relative;
-        }
-
-            .nav-btn i {
-                font-size: 1.4rem;
-                margin-bottom: 4px;
-            }
-
-            .nav-btn.active {
-                color: var(--primary-color);
-                font-weight: 700;
-            }
-
-        #bottom-nav-cart-count {
-            position: absolute;
-            top: 5px;
-            right: 25%;
-            transform: translateX(50%);
-            font-size: 0.6rem;
-            padding: 2px 5px;
-        }
-
-        .desktop-container {
-            display: none;
-        }
-
-
-        /* === التحسين: تصميم اسم المتجر بشكل احترافي === */
-        .store-title {
-            font-weight: 900; /* Extra bold font weight */
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            position: relative;
-            display: inline-block;
-            padding-bottom: 0.5rem;
-        }
-
-            .store-title::after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 80px;
-                height: 4px;
-                background-color: var(--primary-color);
-                border-radius: 2px;
-            }
-
-        /* === التحسين: تصميم زر "في السلة" === */
-        .add-to-cart-btn.in-cart {
-            background-color: var(--success-color);
-            border-color: var(--success-color);
-            color: white;
-        }
-
-            .add-to-cart-btn.in-cart:hover {
-                background-color: #157347;
-                border-color: #146c43;
-            }
-
-
-        @@media (min-width: 992px) {
-            .app-shell {
-                display: none;
-            }
-
-            .desktop-container {
-                display: block;
-            }
-        }
-
-        /* === التحسين: شريط التمرير الأفقي للفئات === */
-        .horizontal-scroll-container {
-            display: flex;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 15px;
-            margin-bottom: -15px;
-        }
-
-            .horizontal-scroll-container::-webkit-scrollbar {
-                display: none;
-            }
-
-        .horizontal-scroll-container {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-            .horizontal-scroll-container .company-card-btn {
-                flex-shrink: 0;
-            }
-    </style>
 </head>
 <body>
     <input type="hidden" id="current-store-id" value="@Model.CurrentStore.Id" />
 
-    <!-- ================================================================= DESKTOP VIEW ================================================================== -->
     <div class="desktop-container">
         <div class="container py-4">
-            <header class="store-header text-center">
+            <header class="store-header text-center mb-5">
                 @if (!string.IsNullOrEmpty(Model.CurrentStore.LogoUrl))
-                {<img src="@Url.Content("~" + Model.CurrentStore.LogoUrl)" alt="Logo" class="main-logo-header mb-3" />}
+                {
+                    <img src="@Model.CurrentStore.LogoUrl" alt="Logo" class="main-logo-header mb-3" />
+                }
                 <h1 class="store-title">@Model.CurrentStore.Name</h1>
                 <p class="lead text-muted">تصفح أحدث المنتجات المتوفرة لدينا</p>
                 <div class="search-bar-container mx-auto mt-4">
-                    <input type="search" id="product-search-input-desktop" class="form-control form-control-lg" placeholder="ابحث عن منتج...">
+                    <input type="search" id="product-search-input-desktop" class="form-control form-control-lg rounded-pill" placeholder="ابحث عن منتج...">
                     <i class="fas fa-search search-icon"></i>
                 </div>
             </header>
-            <div class="row mt-5">
+
+            <div class="row">
                 <div class="col-lg-9">
                     @if (Model.Companies.Any())
                     {
                         <section id="companies-section-desktop" class="mb-5">
                             <h3 class="section-title">تصفح حسب الماركة</h3>
-                            <div class="horizontal-scroll-container gap-3">
-                                <button class="company-card-btn active" data-company-id="0">الكل</button>
-                                @foreach (var company in Model.Companies)
-                                {
-                                    <button class="company-card-btn" data-company-id="@company.Id">
-                                        @if (!string.IsNullOrEmpty(company.LogoUrl))
-                                        {<img src="@Url.Content("~" + company.LogoUrl)" alt="@company.Name" class="company-logo" />}
-                                        <span class="company-name">@company.Name</span>
-                                    </button>
-                                }
+                            <div class="brands-carousel-wrapper">
+                                @*<button class="carousel-arrow prev" id="scroll-prev-desktop" aria-label="Previous"><i class="fas fa-chevron-right"></i></button>*@
+                                <div class="horizontal-scroll-container gap-3" id="brands-scroll-desktop">
+                                    <button class="company-card-btn active" data-company-id="0">الكل</button>
+                                    @foreach (var company in Model.Companies)
+                                    {
+                                        <button class="company-card-btn" data-company-id="@company.Id">
+                                            @if (!string.IsNullOrEmpty(company.LogoUrl))
+                                            {
+                                                <img src="@company.LogoUrl" alt="@company.Name" class="company-logo" />
+                                            }
+                                            <span class="company-name">@company.Name</span>
+                                        </button>
+                                    }
+                                </div>
+                                @*<button class="carousel-arrow next" id="scroll-next-desktop" aria-label="Next"><i class="fas fa-chevron-left"></i></button>*@
                             </div>
                         </section>
                     }
+
                     <section id="products-section-desktop">
-                        <div id="products-list-desktop" class="row gx-4 gy-4">
+                        <div id="products-list-desktop" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                             @foreach (var product in Model.Products)
                             {
-                                <div class="col-lg-3 col-md-4 col-6 product-card-wrapper"
+                                var imageUrl = product.ImageUrl ?? "/images/placeholder.png";
+                                <div class="col product-card-wrapper"
                                      data-product-id="@product.Id" data-product-name="@product.Name" data-company-id="@product.CompanyId"
-                                     data-product-price="@product.Price" data-product-image="@Url.Content("~" + (product.ImageUrl ?? "/images/placeholder.png"))"
+                                     data-product-price="@product.Price" data-product-image="@imageUrl"
                                      data-product-description="@(product.Description ?? "لا يوجد وصف متاح.")">
                                     <div class="card product-card h-100">
-                                        <div class="product-image-container"><img src="@Url.Content("~" + (product.ImageUrl ?? "/images/placeholder.png"))" class="product-image" alt="@product.Name"></div>
+                                        <div class="product-image-container"><img src="@imageUrl" class="product-image" alt="@product.Name"></div>
                                         <div class="card-body d-flex flex-column p-3">
                                             <h5 class="product-name flex-grow-1">@product.Name</h5>
                                             <div class="mt-auto">
@@ -250,16 +87,20 @@
                         </div>
                     </section>
                 </div>
+
                 <div class="col-lg-3">
-                    <aside id="cart-sidebar" class="sticky-top" style="top: 20px;">
-                        <div class="cart-header"><h5><i class="fas fa-shopping-cart me-2"></i>سلة المشتريات</h5></div>
-                        <div class="cart-body" style="max-height: 400px; overflow-y: auto;">
+                    <aside class="cart-sidebar sticky-top" style="top: 20px;">
+                        <h5 class="mb-3 fw-bold"><i class="fas fa-shopping-cart me-2"></i>سلة المشتريات</h5>
+                        <div class="cart-body">
                             <div id="cart-items-desktop"></div>
                             <p class="cart-empty-msg text-center text-muted p-4">سلتك فارغة حالياً.</p>
                         </div>
                         <div class="cart-footer pt-3 mt-3 border-top">
-                            <div class="d-flex justify-content-between align-items-center"><strong>الإجمالي</strong><strong><span id="cart-total-desktop">0.00</span> جنيه</strong></div>
-                            <div class="d-grid mt-3"><button class="btn btn-success btn-lg checkout-btn" disabled><i class="fab fa-whatsapp me-2"></i>إتمام الطلب</button></div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <strong class="fs-5">الإجمالي</strong>
+                                <strong class="fs-5"><span id="cart-total-desktop">0.00</span> جنيه</strong>
+                            </div>
+                            <div class="d-grid"><button class="btn btn-success btn-lg checkout-btn" disabled><i class="fab fa-whatsapp me-2"></i>إتمام الطلب</button></div>
                         </div>
                     </aside>
                 </div>
@@ -267,41 +108,45 @@
         </div>
     </div>
 
-    <!-- ================================================================= MOBILE APP SHELL ================================================================== -->
     <div class="app-shell">
         <main class="app-main">
             <div id="view-home" class="app-view active">
                 <header class="app-view-header"><h1>@Model.CurrentStore.Name</h1></header>
                 <div class="app-view-content">
                     <div class="search-bar-container mb-4">
-                        <input type="search" id="product-search-input-mobile" class="form-control" placeholder="ابحث عن منتج...">
+                        <input type="search" id="product-search-input-mobile" class="form-control rounded-pill" placeholder="ابحث عن منتج...">
                         <i class="fas fa-search search-icon"></i>
                     </div>
                     @if (Model.Companies.Any())
                     {
                         <section id="companies-section-mobile" class="mb-4">
-                            <div class="horizontal-scroll-container gap-2">
-                                <button class="company-card-btn active" data-company-id="0">الكل</button>
-                                @foreach (var company in Model.Companies)
-                                {
-                                    <button class="company-card-btn" data-company-id="@company.Id">
-                                        @if (!string.IsNullOrEmpty(company.LogoUrl))
-                                        {<img src="@Url.Content("~" + company.LogoUrl)" alt="@company.Name" class="company-logo" />}
-                                        <span class="company-name">@company.Name</span>
-                                    </button>
-                                }
+                            <div class="brands-carousel-wrapper">
+                                @*<button class="carousel-arrow prev" id="scroll-prev-mobile" aria-label="Previous"><i class="fas fa-chevron-right"></i></button>*@
+                                <div class="horizontal-scroll-container gap-2" id="brands-scroll-mobile">
+                                    <button class="company-card-btn active" data-company-id="0">الكل</button>
+                                    @foreach (var company in Model.Companies)
+                                    {
+                                        <button class="company-card-btn" data-company-id="@company.Id">
+                                            @if (!string.IsNullOrEmpty(company.LogoUrl))
+                                            {<img src="@company.LogoUrl" alt="@company.Name" class="company-logo" />}
+                                            <span class="company-name">@company.Name</span>
+                                        </button>
+                                    }
+                                </div>
+                                @*<button class="carousel-arrow next" id="scroll-next-mobile" aria-label="Next"><i class="fas fa-chevron-left"></i></button>*@
                             </div>
                         </section>
                     }
                     <div id="products-list-mobile" class="row g-3">
                         @foreach (var product in Model.Products)
                         {
+                            var imageUrl = product.ImageUrl ?? "/images/placeholder.png";
                             <div class="col-6 product-card-wrapper"
                                  data-product-id="@product.Id" data-product-name="@product.Name" data-company-id="@product.CompanyId"
-                                 data-product-price="@product.Price" data-product-image="@Url.Content("~" + (product.ImageUrl ?? "/images/placeholder.png"))"
+                                 data-product-price="@product.Price" data-product-image="@imageUrl"
                                  data-product-description="@(product.Description ?? "لا يوجد وصف متاح.")">
                                 <div class="card product-card h-100">
-                                    <div class="product-image-container"><img src="@Url.Content("~" + (product.ImageUrl ?? "/images/placeholder.png"))" class="product-image" alt="@product.Name"></div>
+                                    <div class="product-image-container"><img src="@imageUrl" class="product-image" alt="@product.Name"></div>
                                     <div class="card-body d-flex flex-column p-2">
                                         <h5 class="product-name flex-grow-1" style="font-size: 0.85rem;">@product.Name</h5>
                                         <div class="mt-auto">
@@ -321,7 +166,7 @@
                     <div id="cart-items-mobile" class="mb-3"></div>
                     <p class="cart-empty-msg-mobile text-center text-muted p-4">سلتك فارغة حالياً.</p>
                 </div>
-                <div class="cart-footer-mobile p-3 border-top bg-white" style="display: none;">
+                <div class="cart-footer-mobile p-3 border-top bg-white">
                     <div class="d-flex justify-content-between align-items-center mb-3"><strong>الإجمالي</strong><strong><span id="cart-total-mobile">0.00</span> جنيه</strong></div>
                     <div class="d-grid"><button class="btn btn-success btn-lg checkout-btn" disabled><i class="fab fa-whatsapp me-2"></i>إتمام الطلب</button></div>
                 </div>
@@ -337,50 +182,50 @@
         </nav>
     </div>
 
-    <!-- Modals -->
-    <div class="modal fade" id="productDetailsModal" tabindex="-1">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header border-0"><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-                <div class="modal-body pt-0">
-                    <div class="row">
-                        <div class="col-md-6 mb-3 mb-md-0"><img id="modal-product-image" src="" class="img-fluid rounded" alt="Product Image"></div>
-                        <div class="col-md-6 d-flex flex-column">
-                            <h3 id="modal-product-name" class="mb-2"></h3>
-                            <p id="modal-product-description" class="text-muted flex-grow-1"></p>
-                            <div class="mt-auto">
-                                <h4 id="modal-product-price" class="fw-bold mb-3"></h4>
-                                <button id="modal-add-to-cart-btn" class="btn btn-primary btn-lg w-100 add-to-cart-btn"><i class="fas fa-cart-plus me-1"></i> إضافة للسلة</button>
-                            </div>
+ 
+
+<div class="modal fade" id="productDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0"><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body pt-0">
+                <div class="row">
+                    <div class="col-md-6 mb-3 mb-md-0"><img id="modal-product-image" src="" class="img-fluid rounded" alt="Product Image"></div>
+                    <div class="col-md-6 d-flex flex-column">
+                        <h3 id="modal-product-name" class="mb-2"></h3>
+                        <p id="modal-product-description" class="text-muted flex-grow-1"></p>
+                        <div class="mt-auto">
+                            <h4 id="modal-product-price" class="fw-bold mb-3"></h4>
+                            <button id="modal-add-to-cart-btn" class="btn btn-primary btn-lg w-100 add-to-cart-btn"><i class="fas fa-cart-plus me-1"></i> إضافة للسلة</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="checkoutModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header"><h5 class="modal-title">بيانات التوصيل</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-                <div class="modal-body">
-                    <form id="checkout-form" novalidate>
-                        @Html.AntiForgeryToken()
-                        <div class="mb-3"><label for="customer-name" class="form-label">الاسم</label><input type="text" class="form-control" id="customer-name" required></div>
-                        <div class="mb-3"><label for="customer-phone" class="form-label">الهاتف</label><input type="tel" class="form-control" id="customer-phone" required></div>
-                        <div class="mb-3"><label for="customer-address" class="form-label">العنوان</label><textarea class="form-control" id="customer-address" rows="3" required></textarea></div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="button" id="confirm-order-btn" class="btn btn-primary">تأكيد الطلب</button>
-                </div>
+</div>
+<div class="modal fade" id="checkoutModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">بيانات التوصيل</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <form id="checkout-form" novalidate>
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3"><label for="customer-name" class="form-label">الاسم</label><input type="text" class="form-control" id="customer-name" required></div>
+                    <div class="mb-3"><label for="customer-phone" class="form-label">الهاتف</label><input type="tel" class="form-control" id="customer-phone" required></div>
+                    <div class="mb-3"><label for="customer-address" class="form-label">العنوان</label><textarea class="form-control" id="customer-address" rows="3" required></textarea></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" id="confirm-order-btn" class="btn btn-primary">تأكيد الطلب</button>
             </div>
         </div>
     </div>
+</div>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/store.js" asp-append-version="true"></script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/store.js" asp-append-version="true"></script>
 </body>
 </html>
-

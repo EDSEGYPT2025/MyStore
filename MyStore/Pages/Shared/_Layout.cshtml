@@ -5,37 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - MyStore</title>
 
-    <!-- Bootstrap RTL -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
-
-    <!-- Google Fonts (Cairo) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-
-    <!-- === الإصلاح: تحميل ملف التصميم الصحيح style.css === -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MyStore.styles.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand fw-bold" asp-area="" asp-page="/Index">MyStore</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+<body class="d-flex flex-column min-vh-100">
+
+    <header class="shadow-sm">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white">
+            <div class="container py-2">
+                <a class="navbar-brand fw-bolder fs-4" asp-area="" asp-page="/Index">
+                    <i class="fas fa-store text-primary"></i>
+                    MyStore
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <div class="collapse navbar-collapse" id="main-navbar">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-primary fw-bold" asp-area="" asp-page="/Admin/Stores/Index">
-                                    <i class="fas fa-cogs me-1"></i> لوحة التحكم
+                                <a class="nav-link fw-bold" asp-page="/Admin/Stores/Index">
+                                    <i class="fas fa-tachometer-alt me-1"></i> لوحة تحكم الأدمن
+                                </a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Manager"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link fw-bold" asp-page="/Manager/Index">
+                                    <i class="fas fa-user-shield me-1"></i> لوحة تحكم المدير
                                 </a>
                             </li>
                         }
@@ -45,19 +49,23 @@
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+
+    <div class="container flex-grow-1">
+        <main role="main" class="py-4">
             @RenderBody()
         </main>
     </div>
 
+    <footer class="footer border-top bg-light text-muted mt-auto">
+        <div class="container text-center py-3">
+            &copy; @DateTime.Now.Year - MyStore - جميع الحقوق محفوظة
+        </div>
+    </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- === الإصلاح النهائي: تحميل ملف الجافاسكريبت الصحيح store.js === -->
     <script src="~/js/store.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-

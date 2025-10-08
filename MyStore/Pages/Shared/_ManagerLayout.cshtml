@@ -1,163 +1,121 @@
 ﻿<!DOCTYPE html>
-<!--
-    English: The html tag includes a data-theme attribute for the dark/light mode switcher.
-    العربية: وسم html يحتوي على خاصية data-theme للتحكم في الوضع الليلي/الفاتح
--->
 <html lang="ar" dir="rtl" data-theme="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - لوحة تحكم متجري</title>
 
-    <!-- English: Tailwind CSS from CDN for a modern utility-first framework. -->
-    <!-- العربية: تحميل Tailwind CSS مباشرةً لإطار عمل حديث يعتمد على الأدوات -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- English: Google Fonts for elegant typography. -->
-    <!-- العربية: تحميل خطوط جوجل لمظهر طباعي أنيق -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 
-    <!-- English: A dedicated, clean stylesheet for the admin layout components and themes. -->
-    <!-- العربية: ملف تصميم مخصص ومنظم لمكونات لوحة التحكم والسمات -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <link rel="stylesheet" href="~/css/admin_layout.css" asp-append-version="true" />
 </head>
 <body class="bg-background text-foreground">
-    <!--
-        English: Main wrapper for the entire page. JS uses this to toggle sidebar state (expanded/collapsed).
-        العربية: الحاوية الرئيسية للصفحة بالكامل. يستخدمها الجافاسكريبت للتحكم في حالة القائمة الجانبية (موسعة/مصغرة)
-    -->
+
     <div class="page-wrapper">
-        <!-- ============================================================== -->
-        <!-- English: Sidebar navigation -->
-        <!-- العربية: القائمة الجانبية للتنقل -->
-        <!-- ============================================================== -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <i data-lucide="shopping-cart" class="me-2"></i>
-                <span class="logo-text">MyStore Panel</span>
+                <i data-lucide="shopping-cart" class="logo-icon"></i>
+                <span class="logo-text">MyStore</span>
             </div>
             <nav class="sidebar-nav">
                 <a asp-page="/Manager/Index" class="nav-link">
-                    <i data-lucide="layout-dashboard"></i>
-                    <span class="link-text">الرئيسية</span>
+                    <i data-lucide="layout-dashboard"></i><span class="link-text">الرئيسية</span>
                 </a>
                 <a asp-page="/Manager/Products/Index" class="nav-link">
-                    <i data-lucide="package"></i>
-                    <span class="link-text">إدارة المنتجات</span>
+                    <i data-lucide="package"></i><span class="link-text">إدارة المنتجات</span>
                 </a>
                 <a asp-page="/Manager/Companies/Index" class="nav-link">
-                    <i data-lucide="building-2"></i>
-                    <span class="link-text">إدارة الماركات</span>
+                    <i data-lucide="building-2"></i><span class="link-text">إدارة الماركات</span>
                 </a>
                 <a asp-page="/Manager/Orders/Index" class="nav-link">
-                    <i data-lucide="receipt"></i>
-                    <span class="link-text">إدارة الطلبات</span>
+                    <i data-lucide="receipt"></i><span class="link-text">إدارة الطلبات</span>
                 </a>
             </nav>
         </aside>
 
-        <!-- ============================================================== -->
-        <!-- English: Main content area -->
-        <!-- العربية: منطقة المحتوى الرئيسية -->
-        <!-- ============================================================== -->
         <main class="main-content">
-            <!-- English: Topbar header with sidebar toggles and user menu. -->
-            <!-- العربية: الشريط العلوي مع أزرار التحكم بالقائمة وقائمة المستخدم -->
             <header class="topbar">
-                <div class="flex items-center">
-                    <button class="sidebar-toggler hidden lg:block" id="sidebar-toggler-desktop">
-                        <i data-lucide="panel-left-close"></i>
-                    </button>
-                    <button class="sidebar-toggler lg:hidden" id="sidebar-toggler-mobile">
-                        <i data-lucide="menu"></i>
-                    </button>
+                <div class="flex items-center gap-2">
+                    <button class="sidebar-toggler hidden lg:flex" id="sidebar-toggler-desktop" aria-label="Toggle sidebar"><i data-lucide="panel-left-close"></i></button>
+                    <button class="sidebar-toggler lg:hidden" id="sidebar-toggler-mobile" aria-label="Open sidebar"><i data-lucide="menu"></i></button>
                 </div>
-
                 <div class="flex items-center gap-4">
-                    <button class="theme-toggler" id="theme-toggler">
-                        <i data-lucide="moon" class="icon-dark"></i>
-                        <i data-lucide="sun" class="icon-light"></i>
+                    <button class="theme-toggler" id="theme-toggler" aria-label="Toggle theme">
+                        <i data-lucide="moon" class="icon-dark"></i><i data-lucide="sun" class="icon-light"></i>
                     </button>
-
-                    <div class="ms-3">
-                        <partial name="_LoginPartial" />
-                    </div>
+                    <div class="h-6 w-px bg-border"></div>
+                    <partial name="_LoginPartial" />
                 </div>
             </header>
-
-            <!-- English: Main page content is rendered here. -->
-            <!-- العربية: يتم عرض محتوى الصفحة الرئيسي هنا -->
-            @*<div class="page-body">*@
+            <div class="page-body">
                 @RenderBody()
-            @*</div>*@
+            </div>
         </main>
     </div>
 
-    <!-- English: Overlay for mobile view when sidebar is open. -->
-    <!-- العربية: طبقة معتمة لواجهة الموبايل عند فتح القائمة الجانبية -->
     <div class="overlay"></div>
 
-    <!-- English: Core libraries -->
-    <!-- العربية: المكتبات الأساسية -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- English: Chart.js for data visualization. -->
-    <!-- العربية: مكتبة الرسوم البيانية لعرض البيانات -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- English: Lucide Icons for modern, clean icons. -->
-    <!-- العربية: مكتبة أيقونات Lucide لمظهر عصري ونظيف -->
-    <script src="https://unpkg.com/lucide@latest"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 
-    <!-- English: Main JavaScript for dashboard interactivity (sidebar, theme, active links). -->
-    <!-- العربية: الجافاسكريبت الرئيسي للتفاعلية (القائمة، السمات، الروابط النشطة) -->
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // --- Icon Replacement ---
-            lucide.createIcons();
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                lucide.createIcons();
 
-            // --- Selectors ---
-            const desktopToggler = document.getElementById("sidebar-toggler-desktop");
-            const mobileToggler = document.getElementById("sidebar-toggler-mobile");
-            const pageWrapper = document.querySelector(".page-wrapper");
-            const overlay = document.querySelector(".overlay");
-            const themeToggler = document.getElementById("theme-toggler");
-            const htmlElement = document.documentElement;
+                const pageWrapper = document.querySelector('.page-wrapper');
+                const desktopToggler = document.getElementById('sidebar-toggler-desktop');
+                const mobileToggler = document.getElementById('sidebar-toggler-mobile');
+                const overlay = document.querySelector('.overlay');
+                const themeToggler = document.getElementById('theme-toggler');
+                const htmlEl = document.documentElement;
 
-            // --- Sidebar Toggle Logic ---
-            desktopToggler?.addEventListener("click", () => pageWrapper.classList.toggle("sidebar-collapsed"));
-            mobileToggler?.addEventListener("click", () => pageWrapper.classList.add("sidebar-visible"));
-            overlay?.addEventListener("click", () => pageWrapper.classList.remove("sidebar-visible"));
-
-            // --- Theme (Dark/Light Mode) Logic ---
-            function applyTheme(theme) {
-                htmlElement.setAttribute('data-theme', theme);
-                localStorage.setItem('theme', theme);
-            }
-            themeToggler?.addEventListener('click', () => {
-                const currentTheme = htmlElement.getAttribute('data-theme');
-                applyTheme(currentTheme === 'light' ? 'dark' : 'light');
-            });
-            applyTheme(localStorage.getItem('theme') || 'light');
-
-            // --- Active Link Highlighting Logic ---
-            const currentPagePath = window.location.pathname.toLowerCase();
-            const navLinks = document.querySelectorAll(".sidebar-nav .nav-link");
-            let bestMatch = null;
-            navLinks.forEach(link => {
-                const linkPath = link.getAttribute("href")?.toLowerCase();
-                if (linkPath && currentPagePath.startsWith(linkPath)) {
-                    if (!bestMatch || linkPath.length > bestMatch.getAttribute("href").length) {
-                        bestMatch = link;
-                    }
+                if (pageWrapper) {
+                    desktopToggler?.addEventListener('click', () => pageWrapper.classList.toggle('sidebar-collapsed'));
+                    mobileToggler?.addEventListener('click', () => pageWrapper.classList.add('sidebar-visible'));
+                    overlay?.addEventListener('click', () => pageWrapper.classList.remove('sidebar-visible'));
                 }
-            });
-            bestMatch?.classList.add("active");
+
+                const applyTheme = (theme) => {
+                    htmlEl.setAttribute('data-theme', theme);
+                    localStorage.setItem('theme', theme);
+                };
+                themeToggler?.addEventListener('click', () => {
+                    const current = htmlEl.getAttribute('data-theme');
+                    applyTheme(current === 'light' ? 'dark' : 'light');
+                });
+                applyTheme(localStorage.getItem('theme') || 'light');
+
+                const navLinks = document.querySelectorAll('.sidebar-nav .nav-link');
+                const currentPath = window.location.pathname.toLowerCase();
+                let activeLink = null;
+
+                if (currentPath === '/manager' || currentPath === '/manager/') {
+                    activeLink = document.querySelector('.sidebar-nav a[asp-page="/Manager/Index"]');
+                } else {
+                    let longestMatch = 0;
+                    navLinks.forEach(link => {
+                        const href = link.getAttribute('href')?.toLowerCase();
+                        if (href && currentPath.startsWith(href) && href.length > longestMatch) {
+                            longestMatch = href.length;
+                            activeLink = link;
+                        }
+                    });
+                }
+
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
+
+            } catch (error) {
+                console.error("An error occurred in the layout script:", error);
+            }
         });
     </script>
 </body>
 </html>
-

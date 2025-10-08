@@ -3,171 +3,57 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - لوحة تحكم متجري</title>
+    <title>@ViewData["Title"] - لوحة التحكم</title>
 
-    <!-- Bootstrap RTL (Local) -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.rtl.min.css" />
-
-    <!-- Google Fonts (Cairo) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-
-    <!-- Custom Stylesheet -->
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-
-    <style>
-        /* CSS Variables for easy theme management */
-        :root {
-            --admin-sidebar-width: 260px;
-            --admin-topbar-height: 60px;
-            --admin-sidebar-bg: #212529; /* Darker sidebar */
-            --admin-sidebar-link-color: #adb5bd;
-            --admin-sidebar-link-hover-color: #ffffff;
-            --admin-sidebar-active-bg: #0d6efd;
-            --admin-content-bg: #f4f6f9; /* Light grey content area */
-        }
-
-        body {
-            background-color: var(--admin-content-bg);
-            font-family: 'Cairo', sans-serif;
-            overflow-x: hidden;
-        }
-
-        .sidebar {
-            position: fixed;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            width: var(--admin-sidebar-width);
-            z-index: 100;
-            box-shadow: 0 0 1rem rgba(0,0,0,.1);
-            background-color: var(--admin-sidebar-bg);
-        }
-
-        .sidebar-brand {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: var(--admin-topbar-height);
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #fff;
-            text-decoration: none;
-            background-color: rgba(0,0,0,0.2);
-        }
-
-            .sidebar-brand i {
-                margin-left: 10px; /* For RTL */
-            }
-
-        .sidebar-sticky {
-            height: calc(100vh - var(--admin-topbar-height));
-            overflow-y: auto;
-        }
-
-        .nav-link {
-            font-weight: 500;
-            color: var(--admin-sidebar-link-color);
-            display: flex;
-            align-items: center;
-            padding: 0.85rem 1.5rem;
-            transition: all 0.2s ease-in-out;
-            border-right: 3px solid transparent;
-        }
-
-            .nav-link .fa-fw {
-                width: 1.5em;
-                margin-left: 0.5rem; /* For RTL */
-            }
-
-            .nav-link:hover {
-                color: var(--admin-sidebar-link-hover-color);
-                background-color: rgba(255, 255, 255, 0.05);
-            }
-
-            .nav-link.active {
-                color: #fff;
-                background-color: var(--admin-sidebar-active-bg);
-                border-right-color: #66b0ff;
-            }
-
-        .wrapper {
-            margin-right: var(--admin-sidebar-width);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            transition: margin-right 0.3s ease;
-        }
-
-        .topbar {
-            height: var(--admin-topbar-height);
-            background-color: #fff;
-            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
-            display: flex;
-            align-items: center;
-            justify-content: flex-end; /* Align items to the left for RTL */
-            padding: 0 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 99;
-        }
-
-        .main-content {
-            flex-grow: 1;
-            padding: 2rem;
-        }
-    </style>
+    <link rel="stylesheet" href="~/css/admin_layout.css" asp-append-version="true" />
 </head>
 <body>
-
-    <nav class="sidebar">
+    <nav class="sidebar" id="admin-sidebar">
         <a class="sidebar-brand" asp-page="/Index">
             <i class="fas fa-store-alt"></i>
             <span>MyStore Panel</span>
         </a>
-        <div class="sidebar-sticky">
-            <ul class="nav flex-column p-0 mt-3">
+        <div class="sidebar-nav">
+            <ul class="nav flex-column p-0">
                 <li class="nav-item">
-                    <a class="nav-link active" asp-page="/Admin/Stores/Index">
-                        <i class="fas fa-store fa-fw"></i>
-                        إدارة المتاجر
+                    <a class="nav-link" asp-page="/Admin/Index">
+                        <i class="fas fa-tachometer-alt fa-fw"></i> لوحة التحكم
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-page="/Admin/Stores/Index">
+                        <i class="fas fa-store fa-fw"></i> إدارة المتاجر
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" asp-page="/Admin/Products/Index">
-                        <i class="fas fa-boxes-stacked fa-fw"></i>
-                        إدارة المنتجات
+                        <i class="fas fa-boxes-stacked fa-fw"></i> إدارة المنتجات
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" asp-page="/Admin/Companies/Index">
-                        <i class="far fa-copyright fa-fw"></i>
-                        إدارة الماركات
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-users fa-fw"></i>
-                        إدارة المستخدمين
+                    <a class="nav-link" asp-page="/Admin/Orders/Index">
+                        <i class="fas fa-receipt fa-fw"></i> إدارة الطلبات
                     </a>
                 </li>
                 <li class="nav-item mt-3 border-top pt-3">
                     <a class="nav-link" asp-page="/Index">
-                        <i class="fas fa-globe fa-fw"></i>
-                        العودة للموقع
+                        <i class="fas fa-globe fa-fw"></i> العودة للموقع
                     </a>
                 </li>
             </ul>
         </div>
     </nav>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <div class="wrapper">
+    <div class="admin-wrapper">
         <header class="topbar">
-            <!-- This will display the logged-in user's name and logout button -->
+            <button class="btn btn-light d-lg-none" id="sidebar-toggler">
+                <i class="fas fa-bars"></i>
+            </button>
             <partial name="_LoginPartial" />
         </header>
 
@@ -178,9 +64,48 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // --- Sidebar Toggle for Mobile ---
+            const sidebar = document.getElementById('admin-sidebar');
+            const toggler = document.getElementById('sidebar-toggler');
+            const overlay = document.getElementById('sidebar-overlay');
+
+            if (toggler) {
+                toggler.addEventListener('click', function () {
+                    sidebar.classList.toggle('is-open');
+                });
+            }
+            if (overlay) {
+                overlay.addEventListener('click', function () {
+                    sidebar.classList.remove('is-open');
+                });
+            }
+
+            // --- Dynamic Active Link Highlighting ---
+            const currentPagePath = window.location.pathname.toLowerCase();
+            const navLinks = document.querySelectorAll('.sidebar .nav-link');
+            let bestMatch = null;
+
+            navLinks.forEach(link => {
+                const linkPath = link.getAttribute('href')?.toLowerCase();
+                if (linkPath && currentPagePath.startsWith(linkPath)) {
+                    // Find the most specific (longest) match
+                    if (!bestMatch || linkPath.length > bestMatch.getAttribute('href').length) {
+                        bestMatch = link;
+                    }
+                }
+            });
+
+            // Remove 'active' from any pre-set links and apply to the best match
+            if (bestMatch) {
+                navLinks.forEach(link => link.classList.remove('active'));
+                bestMatch.classList.add('active');
+            }
+        });
+    </script>
 </body>
 </html>
-

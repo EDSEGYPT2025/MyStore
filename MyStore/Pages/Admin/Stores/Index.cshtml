@@ -6,7 +6,10 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3">@ViewData["Title"]</h1>
+    <div>
+        <h1 class="h3 mb-0">@ViewData["Title"]</h1>
+        <p class="text-muted small mb-0">إضافة وتعديل وإدارة جميع المتاجر المسجلة في النظام.</p>
+    </div>
     <a asp-page="Create" class="btn btn-primary">
         <i class="fas fa-plus me-2"></i>إضافة متجر جديد
     </a>
@@ -15,60 +18,61 @@
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
         @TempData["SuccessMessage"]
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
 
 <div class="card shadow-sm">
-    <div class="card-body p-0">
-        <table class="table table-hover table-striped mb-0">
+    <div class="card-header border-0">
+        <h5 class="mb-0">قائمة المتاجر</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-nowrap mb-0">
             <thead class="table-light">
                 <tr>
-                    <th>اسم المتجر</th>
-                    <th>المالك</th>
-                    <th>الهاتف</th>
-                    <th>تاريخ الإنشاء</th>
-                    <th class="text-center">الحالة</th>
-                    <th></th>
+                    <th scope="col">اسم المتجر</th>
+                    <th scope="col">المالك</th>
+                    <th scope="col">الهاتف</th>
+                    <th scope="col">تاريخ الإنشاء</th>
+                    <th scope="col" class="text-center">الحالة</th>
+                    <th scope="col" class="text-end">الإجراءات</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model.StoresList)
                 {
                     <tr>
-                        <td>
+                        <td class="align-middle">
                             <div class="d-flex align-items-center">
-                                <img src="@(item.LogoUrl ?? "/images/placeholder.png")" alt="Logo" class="rounded-circle me-2" width="40" height="40" style="object-fit: cover;" />
+                                <img src="@(item.LogoUrl ?? "/images/placeholder.png")" alt="Logo" class="rounded-circle me-3" width="45" height="45" style="object-fit: cover;" />
                                 <div>
                                     <div class="fw-bold">@item.Name</div>
-                                    <a href="@item.StoreUrl" target="_blank" class="text-muted small">@item.Slug</a>
+                                    <a href="@item.StoreUrl" target="_blank" class="text-muted small text-decoration-none">@item.Slug</a>
                                 </div>
                             </div>
                         </td>
-                        <td>@item.OwnerName</td>
-                        <td>@item.OwnerPhone</td>
-                        <td>@item.CreatedAt.ToShortDateString()</td>
-                        <td class="text-center">
+                        <td class="align-middle">@item.OwnerName</td>
+                        <td class="align-middle text-muted">@item.OwnerPhone</td>
+                        <td class="align-middle text-muted">@item.CreatedAt.ToString("yyyy/MM/dd")</td>
+                        <td class="align-middle text-center">
                             @if (item.IsActive)
                             {
-                                <span class="badge bg-success-soft text-success">نشط</span>
+                                <span class="badge rounded-pill bg-success-soft text-success">نشط</span>
                             }
                             else
                             {
-                                <span class="badge bg-danger-soft text-danger">متوقف</span>
+                                <span class="badge rounded-pill bg-danger-soft text-danger">متوقف</span>
                             }
                         </td>
-                        <td class="text-end">
-                            <!-- === الزر الجديد الذي تمت إضافته === -->
-                            <a asp-page="./ManageUsers" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info" title="إدارة المستخدمين">
+                        <td class="align-middle text-end">
+                            <a asp-page="./ManageUsers" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="إدارة المستخدمين">
                                 <i class="fas fa-users"></i>
                             </a>
-
                             <a asp-page="./Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary" title="تعديل">
                                 <i class="fas fa-pencil-alt"></i>
                             </a>
-
                             <form method="post" asp-page-handler="ToggleStatus" asp-route-id="@item.Id" class="d-inline">
                                 <button type="submit" class="btn btn-sm @(item.IsActive ? "btn-outline-warning" : "btn-outline-success")"
                                         title="@(item.IsActive ? "إيقاف المتجر" : "تفعيل المتجر")">
@@ -83,3 +87,22 @@
     </div>
 </div>
 
+@section Scripts {
+    <style>
+        .bg-success-soft {
+            background-color: rgba(25, 135, 84, 0.1);
+        }
+
+        .text-success {
+            color: #198754 !important;
+        }
+
+        .bg-danger-soft {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+
+        .text-danger {
+            color: #dc3545 !important;
+        }
+    </style>
+}

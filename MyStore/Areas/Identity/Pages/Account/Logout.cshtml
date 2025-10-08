@@ -1,0 +1,36 @@
+﻿@page
+@model LogoutModel
+@{
+    ViewData["Title"] = "تسجيل الخروج";
+}
+
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-md-6">
+        <div class="card shadow-sm text-center border-0">
+            <div class="card-body p-5">
+                @{
+                    if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        // This part is shown if the user needs to confirm the logout via a POST request.
+                        // The default Identity UI flow handles this automatically.
+                        <h1 class="h3 mb-3">@ViewData["Title"]</h1>
+                        <p class="text-muted">هل أنت متأكد أنك تريد تسجيل الخروج؟</p>
+                        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+                            <button type="submit" class="btn btn-danger w-100">نعم، قم بتسجيل الخروج</button>
+                        </form>
+                    }
+                    else
+                    {
+                        // This is the confirmation message shown after the user has been logged out.
+                        <i class="fas fa-check-circle text-success fa-4x mb-4"></i>
+                        <h1 class="h3 fw-bold mb-3">تم تسجيل الخروج بنجاح</h1>
+                        <p class="text-muted mb-4">نشكرك على استخدامك لمنصتنا. نأمل أن نراك مرة أخرى قريبًا!</p>
+                        <a class="btn btn-primary btn-lg" asp-page="/Index">
+                            <i class="fas fa-home me-2"></i>العودة إلى الصفحة الرئيسية
+                        </a>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>

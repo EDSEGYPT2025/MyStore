@@ -5,97 +5,83 @@
     Layout = "~/Pages/Shared/_ManagerLayout.cshtml";
 }
 
-<!--
-    English: Main header for the products management page.
-    العربية: الترويسة الرئيسية لصفحة إدارة المنتجات
--->
 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
     <div>
         <h1 class="text-2xl lg:text-3xl font-bold text-foreground">@ViewData["Title"]</h1>
         <p class="text-muted-foreground mt-1">عرض وتعديل وإضافة منتجات جديدة لمتجرك.</p>
     </div>
-    <a asp-page="Create" class="btn btn-primary inline-flex items-center gap-2">
-        <i data-lucide="plus" class="w-4 h-4"></i>
+    <a asp-page="Create" class="inline-flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground font-semibold rounded-lg shadow-sm hover:bg-primary/90 transition-colors">
+        <i data-lucide="plus" class="w-4 h-4 me-2"></i>
         <span>إضافة منتج جديد</span>
     </a>
 </div>
 
-<!--
-    English: Card container for the products table for a clean, modern look.
-    العربية: حاوية البطاقة لجدول المنتجات لمظهر نظيف وعصري
--->
-<div class="card">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="bg-background">
-                    <tr>
-                        <th class="p-4" style="width: 80px;">الصورة</th>
-                        <th class="p-4">اسم المنتج</th>
-                        <th class="p-4">الماركة</th>
-                        <th class="p-4">السعر</th>
-                        <th class="p-4 text-left">الإجراءات</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model.ProductList.Any())
+<div class="bg-card text-card-foreground rounded-xl border shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm text-right">
+            <thead class="bg-muted/50">
+                <tr>
+                    <th scope="col" class="px-6 py-4 font-medium" style="width: 100px;">الصورة</th>
+                    <th scope="col" class="px-6 py-4 font-medium">اسم المنتج</th>
+                    <th scope="col" class="px-6 py-4 font-medium">الماركة</th>
+                    <th scope="col" class="px-6 py-4 font-medium">السعر</th>
+                    <th scope="col" class="px-6 py-4 font-medium text-left">الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-border">
+                @if (Model.ProductList.Any())
+                {
+                    @foreach (var item in Model.ProductList)
                     {
-                        @foreach (var item in Model.ProductList)
-                        {
-                            <tr>
-                                <td class="p-4">
-                                    <img src="@Url.Content("~" + (item.ImageUrl ?? "/images/placeholder.png"))" class="w-14 h-14 object-contain rounded-md" />
-                                </td>
-                                <td class="p-4 align-middle font-semibold">@item.Name</td>
-                                <td class="p-4 align-middle text-muted-foreground">@item.Company.Name</td>
-                                <td class="p-4 align-middle font-semibold">@item.Price.ToString("N2") ج.م</td>
-                                <td class="p-4 align-middle text-left">
-                                    <div class="flex items-center justify-end gap-2">
-                                        <a asp-page="./Edit" asp-route-id="@item.Id" class="btn-icon" title="تعديل">
-                                            <i data-lucide="file-pen-line"></i>
-                                        </a>
-                                        <a asp-page="./Details" asp-route-id="@item.Id" class="btn-icon" title="تفاصيل">
-                                            <i data-lucide="eye"></i>
-                                        </a>
-                                        <a asp-page="./Delete" asp-route-id="@item.Id" class="btn-icon text-red-500" title="حذف">
-                                            <i data-lucide="trash-2"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <!--
-                            English: Empty state message when no products are found.
-                            العربية: رسالة الحالة الفارغة عند عدم العثور على منتجات
-                        -->
-                        <tr>
-                            <td colspan="5" class="text-center p-8">
-                                <div class="flex flex-col items-center gap-4 text-muted-foreground">
-                                    <i data-lucide="package-search" class="w-16 h-16"></i>
-                                    <h3 class="text-xl font-semibold">لم يتم العثور على منتجات</h3>
-                                    <p>لم تقم بإضافة أي منتجات بعد. اضغط على "إضافة منتج جديد" للبدء.</p>
+                        <tr class="hover:bg-muted/50 transition-colors">
+                            <td class="p-4">
+                                <img src="@Url.Content("~" + (item.ImageUrl ?? "/images/placeholder.png"))" class="w-16 h-16 object-cover rounded-lg border" />
+                            </td>
+                            <td class="px-6 py-4 align-middle font-semibold text-foreground">
+                                @item.Name
+                            </td>
+                            <td class="px-6 py-4 align-middle text-muted-foreground">
+                                @item.Company.Name
+                            </td>
+                            <td class="px-6 py-4 align-middle font-semibold">
+                                @item.Price.ToString("N2") ج.م
+                            </td>
+                            <td class="px-6 py-4 align-middle text-left">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a asp-page="./Edit" asp-route-id="@item.Id" class="text-muted-foreground hover:text-primary" title="تعديل">
+                                        <i data-lucide="file-pen-line" class="w-5 h-5"></i>
+                                    </a>
+                                    <a asp-page="./Details" asp-route-id="@item.Id" class="text-muted-foreground hover:text-primary" title="تفاصيل">
+                                        <i data-lucide="eye" class="w-5 h-5"></i>
+                                    </a>
+                                    <a asp-page="./Delete" asp-route-id="@item.Id" class="text-destructive hover:text-destructive/80" title="حذف">
+                                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                    </a>
                                 </div>
                             </td>
                         </tr>
                     }
-                </tbody>
-            </table>
-        </div>
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center p-12">
+                            <div class="flex flex-col items-center gap-4 text-muted-foreground">
+                                <i data-lucide="package-search" class="w-16 h-16"></i>
+                                <h3 class="text-xl font-semibold">لم يتم العثور على منتجات</h3>
+                                <p>ابدأ بإضافة أول منتج لمتجرك الآن.</p>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
 
-<!--
-    English: A small script section to re-initialize Lucide icons after the page loads.
-    العربية: قسم سكريبت صغير لإعادة تفعيل أيقونات Lucide بعد تحميل الصفحة
--->
 @section Scripts {
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            lucide.createIcons();
-        });
+        // Ensure Lucide icons are rendered after page content is loaded
+        lucide.createIcons();
     </script>
 }
-

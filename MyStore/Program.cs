@@ -40,6 +40,15 @@ using (var scope = app.Services.CreateScope())
     try
     {
         await DbInitializer.SeedRolesAndAdminAsync(services);
+
+        // === الكود الجديد الذي يجب إضافته ===
+        // هذا الشرط يضمن أن البيانات الوهمية تضاف فقط في وضع التطوير
+        if (builder.Environment.IsDevelopment())
+        {
+            var context = services.GetRequiredService<ApplicationDbContext>();
+            await DbInitializer.SeedStoreDataAsync(context);
+        }
+        
     }
     catch (Exception ex)
     {

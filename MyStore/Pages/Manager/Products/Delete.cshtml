@@ -5,36 +5,62 @@
     Layout = "~/Pages/Shared/_ManagerLayout.cshtml";
 }
 
-<h1 class="h3 mb-4 text-danger">@ViewData["Title"]</h1>
-
-<div class="alert alert-danger" role="alert">
-    <h4 class="alert-heading">تحذير!</h4>
-    <p>أنت على وشك حذف المنتج التالي نهائياً. لا يمكن التراجع عن هذا الإجراء.</p>
-    <hr>
-    <p class="mb-0">هل أنت متأكد أنك تريد المتابعة؟</p>
-</div>
-
-
-<div class="card shadow-sm">
-    <div class="card-header">
-        <h5>تفاصيل المنتج الذي سيتم حذفه</h5>
-    </div>
-    <div class="card-body">
-        <dl class="row">
-            <dt class="col-sm-2">اسم المنتج</dt>
-            <dd class="col-sm-10">@Model.Product.Name</dd>
-
-            <dt class="col-sm-2">الماركة</dt>
-            <dd class="col-sm-10">@Model.Product.Company.Name</dd>
-
-            <dt class="col-sm-2">السعر</dt>
-            <dd class="col-sm-10">@Model.Product.Price.ToString("C", new System.Globalization.CultureInfo("ar-EG"))</dd>
-        </dl>
-
-        <form method="post">
-            <input type="hidden" asp-for="Product.Id" />
-            <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt me-2"></i>نعم، قم بالحذف</button>
-            <a asp-page="./Index" class="btn btn-secondary">إلغاء</a>
-        </form>
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+    <div>
+        <h1 class="text-2xl font-bold text-destructive">@ViewData["Title"]</h1>
+        <p class="text-muted-foreground mt-1">
+            يرجى مراجعة التفاصيل أدناه قبل تأكيد عملية الحذف.
+        </p>
     </div>
 </div>
+
+<div class="max-w-3xl mx-auto space-y-6">
+    <div class="bg-destructive/10 border-l-4 border-destructive text-destructive p-4 rounded-md" role="alert">
+        <div class="flex">
+            <div class="py-1">
+                <i data-lucide="alert-triangle" class="w-6 h-6 me-3"></i>
+            </div>
+            <div>
+                <p class="font-bold">تحذير! أنت على وشك حذف منتج نهائياً.</p>
+                <p class="text-sm">هذا الإجراء لا يمكن التراجع عنه. سيتم حذف جميع البيانات المتعلقة بهذا المنتج.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-card text-card-foreground rounded-xl border shadow-sm">
+        <div class="p-6">
+            <h3 class="text-lg font-semibold mb-4">تفاصيل المنتج الذي سيتم حذفه:</h3>
+            <div class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-muted-foreground">اسم المنتج:</span>
+                    <span class="font-medium text-foreground">@Model.Product.Name</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-muted-foreground">الماركة:</span>
+                    <span class="font-medium text-foreground">@Model.Product.Company.Name</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-muted-foreground">السعر:</span>
+                    <span class="font-semibold text-primary">@Model.Product.Price.ToString("N2") ج.م</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-6 py-4 bg-muted/50 border-t flex justify-end items-center gap-3">
+            <form method="post" class="flex items-center gap-3">
+                <input type="hidden" asp-for="Product.Id" />
+                <a asp-page="./Index" class="px-4 py-2 text-sm font-medium rounded-md hover:bg-muted">إلغاء</a>
+                <button type="submit" class="inline-flex items-center px-4 py-2 bg-destructive text-destructive-foreground font-semibold rounded-md shadow-sm hover:bg-destructive/90">
+                    <i data-lucide="trash-2" class="w-4 h-4 me-2"></i>
+                    نعم، قم بالحذف الآن
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        lucide.createIcons();
+    </script>
+}

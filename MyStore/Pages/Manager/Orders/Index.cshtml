@@ -5,46 +5,70 @@
     Layout = "~/Pages/Shared/_ManagerLayout.cshtml";
 }
 
-<h1 class="h3 mb-4">@ViewData["Title"]</h1>
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+    <div>
+        <h1 class="text-2xl lg:text-3xl font-bold text-foreground">@ViewData["Title"]</h1>
+        <p class="text-muted-foreground mt-1">عرض وتتبع جميع الطلبات الواردة إلى متجرك.</p>
+    </div>
+</div>
 
-<div class="card shadow-sm">
-    <div class="card-body p-0">
-        @if (Model.OrderList.Any())
-        {
-            <table class="table table-hover table-striped mb-0">
-                <thead class="table-light">
+<div class="bg-card text-card-foreground rounded-xl border shadow-sm overflow-hidden">
+    @if (Model.OrderList.Any())
+    {
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-right">
+                <thead class="bg-muted/50">
                     <tr>
-                        <th>رقم الطلب</th>
-                        <th>اسم العميل</th>
-                        <th>هاتف العميل</th>
-                        <th>تاريخ الطلب</th>
-                        <th>الإجمالي</th>
-                        <th></th>
+                        <th scope="col" class="px-6 py-4 font-medium">رقم الطلب</th>
+                        <th scope="col" class="px-6 py-4 font-medium">اسم العميل</th>
+                        <th scope="col" class="px-6 py-4 font-medium">هاتف العميل</th>
+                        <th scope="col" class="px-6 py-4 font-medium">تاريخ الطلب</th>
+                        <th scope="col" class="px-6 py-4 font-medium">الإجمالي</th>
+                        <th scope="col" class="px-6 py-4 font-medium text-left"></th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-border">
                     @foreach (var item in Model.OrderList)
                     {
-                        <tr>
-                            <td class="align-middle fw-bold">@item.OrderNumber</td>
-                            <td class="align-middle">@item.CustomerName</td>
-                            <td class="align-middle">@item.CustomerPhone</td>
-                            <td class="align-middle">@item.OrderDate.ToString("g")</td>
-                            <td class="align-middle">@item.TotalAmount.ToString("C", new System.Globalization.CultureInfo("ar-EG"))</td>
-                            <td class="text-end align-middle">
-                                <a asp-page="./Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">عرض التفاصيل</a>
+                        <tr class="hover:bg-muted/50 transition-colors">
+                            <td class="px-6 py-4 align-middle font-semibold text-foreground">
+                                @item.OrderNumber
+                            </td>
+                            <td class="px-6 py-4 align-middle">
+                                @item.CustomerName
+                            </td>
+                            <td class="px-6 py-4 align-middle text-muted-foreground">
+                                @item.CustomerPhone
+                            </td>
+                            <td class="px-6 py-4 align-middle text-muted-foreground">
+                                @item.OrderDate.ToString("yyyy/MM/dd, hh:mm tt")
+                            </td>
+                            <td class="px-6 py-4 align-middle font-semibold text-green-600">
+                                @item.TotalAmount.ToString("N2") ج.م
+                            </td>
+                            <td class="px-6 py-4 align-middle text-left">
+                                <a asp-page="./Details" asp-route-id="@item.Id" class="text-primary hover:underline font-medium">
+                                    عرض التفاصيل
+                                </a>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
-        }
-        else
-        {
-            <div class="p-4 text-center text-muted">
-                <i class="fas fa-receipt fa-3x mb-3"></i>
-                <p>لم تستقبل أي طلبات بعد.</p>
-            </div>
-        }
-    </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center p-12">
+            <i data-lucide="receipt" class="mx-auto h-12 w-12 text-muted-foreground/50"></i>
+            <h3 class="mt-4 text-lg font-medium text-foreground">لا توجد طلبات حتى الآن</h3>
+            <p class="mt-1 text-sm text-muted-foreground">عندما يقوم عميل بإجراء طلب، سيظهر هنا.</p>
+        </div>
+    }
 </div>
+
+@section Scripts {
+    <script>
+        lucide.createIcons();
+    </script>
+}
