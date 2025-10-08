@@ -18,14 +18,33 @@
     <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
 </head>
 <body>
+    @*<input type="hidden" id="current-store-id" value="@Model.CurrentStore.Id" />*@
+
+
     <input type="hidden" id="current-store-id" value="@Model.CurrentStore.Id" />
+    <input type="hidden" id="current-store-phone" value="@Model.CurrentStore.OwnerPhone" />
+
+    <div class="modal fade" id="orderSuccessModal" tabindex="-1" aria-labelledby="orderSuccessModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center border-0 shadow-lg">
+                <div class="modal-body p-5">
+                    <i class="fas fa-check-circle text-success fa-4x mb-4"></i>
+                    <h3 class="modal-title fw-bold mb-3" id="orderSuccessModalLabel">تم إرسال طلبك بنجاح!</h3>
+                    <p class="text-muted">سيتم الآن توجيهك إلى واتساب للتأكيد مباشرة مع صاحب المتجر.</p>
+                    <div class="spinner-border text-primary mt-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="desktop-container">
-        <div class="container py-4">
+        <div class="container py-5">
             <header class="store-header text-center mb-5">
                 @if (!string.IsNullOrEmpty(Model.CurrentStore.LogoUrl))
                 {
-                    <img src="@Model.CurrentStore.LogoUrl" alt="Logo" class="main-logo-header mb-3" />
+                    <img src="@Model.CurrentStore.LogoUrl" alt="Logo" class="main-logo-header mb-4" />
                 }
                 <h1 class="store-title">@Model.CurrentStore.Name</h1>
                 <p class="lead text-muted">تصفح أحدث المنتجات المتوفرة لدينا</p>
@@ -49,9 +68,7 @@
                                     {
                                         <button class="company-card-btn" data-company-id="@company.Id">
                                             @if (!string.IsNullOrEmpty(company.LogoUrl))
-                                            {
-                                                <img src="@company.LogoUrl" alt="@company.Name" class="company-logo" />
-                                            }
+                                            {<img src="@company.LogoUrl" alt="@company.Name" class="company-logo" />}
                                             <span class="company-name">@company.Name</span>
                                         </button>
                                     }
@@ -70,15 +87,15 @@
                                      data-product-id="@product.Id" data-product-name="@product.Name" data-company-id="@product.CompanyId"
                                      data-product-price="@product.Price" data-product-image="@imageUrl"
                                      data-product-description="@(product.Description ?? "لا يوجد وصف متاح.")">
-                                    <div class="card product-card h-100">
-                                        <div class="product-image-container"><img src="@imageUrl" class="product-image" alt="@product.Name"></div>
-                                        <div class="card-body d-flex flex-column p-3">
-                                            <h5 class="product-name flex-grow-1">@product.Name</h5>
-                                            <div class="mt-auto">
-                                                <p class="product-price text-primary">@product.Price.ToString("N2") جنيه</p>
-                                                <button class="btn btn-outline-primary w-100 add-to-cart-btn">
-                                                    <i class="fas fa-cart-plus me-1"></i> إضافة للسلة
-                                                </button>
+                                    <div class="product-card">
+                                        <div class="product-image-container">
+                                            <img src="@imageUrl" class="product-image" alt="@product.Name">
+                                        </div>
+                                        <div class="product-info">
+                                            <h5 class="product-name">@product.Name</h5>
+                                            <div class="product-footer">
+                                                <span class="product-price">@product.Price.ToString("N2") جنيه</span>
+                                                <button class="btn btn-primary add-to-cart-btn"><i class="fas fa-cart-plus"></i></button>
                                             </div>
                                         </div>
                                     </div>
@@ -90,15 +107,17 @@
 
                 <div class="col-lg-3">
                     <aside class="cart-sidebar sticky-top" style="top: 20px;">
-                        <h5 class="mb-3 fw-bold"><i class="fas fa-shopping-cart me-2"></i>سلة المشتريات</h5>
+                        <div class="cart-header">
+                            <h5><i class="fas fa-shopping-cart me-2"></i>سلة المشتريات</h5>
+                        </div>
                         <div class="cart-body">
                             <div id="cart-items-desktop"></div>
                             <p class="cart-empty-msg text-center text-muted p-4">سلتك فارغة حالياً.</p>
                         </div>
-                        <div class="cart-footer pt-3 mt-3 border-top">
+                        <div class="cart-footer">
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <strong class="fs-5">الإجمالي</strong>
-                                <strong class="fs-5"><span id="cart-total-desktop">0.00</span> جنيه</strong>
+                                <strong>الإجمالي</strong>
+                                <strong><span id="cart-total-desktop">0.00</span> جنيه</strong>
                             </div>
                             <div class="d-grid"><button class="btn btn-success btn-lg checkout-btn" disabled><i class="fab fa-whatsapp me-2"></i>إتمام الطلب</button></div>
                         </div>
@@ -106,6 +125,12 @@
                 </div>
             </div>
         </div>
+
+        <footer class="store-footer mt-5">
+            <div class="container text-center">
+                <p class="mb-0">&copy; @DateTime.Now.Year - @Model.CurrentStore.Name. جميع الحقوق محفوظة.</p>
+            </div>
+        </footer>
     </div>
 
     <div class="app-shell">
@@ -145,13 +170,13 @@
                                  data-product-id="@product.Id" data-product-name="@product.Name" data-company-id="@product.CompanyId"
                                  data-product-price="@product.Price" data-product-image="@imageUrl"
                                  data-product-description="@(product.Description ?? "لا يوجد وصف متاح.")">
-                                <div class="card product-card h-100">
+                                <div class="product-card">
                                     <div class="product-image-container"><img src="@imageUrl" class="product-image" alt="@product.Name"></div>
-                                    <div class="card-body d-flex flex-column p-2">
-                                        <h5 class="product-name flex-grow-1" style="font-size: 0.85rem;">@product.Name</h5>
-                                        <div class="mt-auto">
-                                            <p class="product-price text-primary small">@product.Price.ToString("N2") جنيه</p>
-                                            <button class="btn btn-sm btn-outline-primary w-100 add-to-cart-btn"><i class="fas fa-cart-plus"></i></button>
+                                    <div class="product-info">
+                                        <h5 class="product-name">@product.Name</h5>
+                                        <div class="product-footer">
+                                            <span class="product-price">@product.Price.ToString("N2") ج</span>
+                                            <button class="btn btn-primary btn-sm add-to-cart-btn"><i class="fas fa-cart-plus"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -162,11 +187,11 @@
             </div>
             <div id="view-cart" class="app-view">
                 <header class="app-view-header"><h1>سلة المشتريات</h1></header>
-                <div class="app-view-content">
+                <div class="app-view-content cart-view-container">
                     <div id="cart-items-mobile" class="mb-3"></div>
                     <p class="cart-empty-msg-mobile text-center text-muted p-4">سلتك فارغة حالياً.</p>
                 </div>
-                <div class="cart-footer-mobile p-3 border-top bg-white">
+                <div class="cart-footer-mobile">
                     <div class="d-flex justify-content-between align-items-center mb-3"><strong>الإجمالي</strong><strong><span id="cart-total-mobile">0.00</span> جنيه</strong></div>
                     <div class="d-grid"><button class="btn btn-success btn-lg checkout-btn" disabled><i class="fab fa-whatsapp me-2"></i>إتمام الطلب</button></div>
                 </div>
@@ -182,50 +207,50 @@
         </nav>
     </div>
 
- 
 
-<div class="modal fade" id="productDetailsModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header border-0"><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body pt-0">
-                <div class="row">
-                    <div class="col-md-6 mb-3 mb-md-0"><img id="modal-product-image" src="" class="img-fluid rounded" alt="Product Image"></div>
-                    <div class="col-md-6 d-flex flex-column">
-                        <h3 id="modal-product-name" class="mb-2"></h3>
-                        <p id="modal-product-description" class="text-muted flex-grow-1"></p>
-                        <div class="mt-auto">
-                            <h4 id="modal-product-price" class="fw-bold mb-3"></h4>
-                            <button id="modal-add-to-cart-btn" class="btn btn-primary btn-lg w-100 add-to-cart-btn"><i class="fas fa-cart-plus me-1"></i> إضافة للسلة</button>
+
+    <div class="modal fade" id="productDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0"><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body pt-0">
+                    <div class="row">
+                        <div class="col-md-6 mb-3 mb-md-0"><img id="modal-product-image" src="" class="img-fluid rounded" alt="Product Image"></div>
+                        <div class="col-md-6 d-flex flex-column">
+                            <h3 id="modal-product-name" class="mb-2"></h3>
+                            <p id="modal-product-description" class="text-muted flex-grow-1"></p>
+                            <div class="mt-auto">
+                                <h4 id="modal-product-price" class="fw-bold mb-3"></h4>
+                                <button id="modal-add-to-cart-btn" class="btn btn-primary btn-lg w-100 add-to-cart-btn"><i class="fas fa-cart-plus me-1"></i> إضافة للسلة</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<div class="modal fade" id="checkoutModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header"><h5 class="modal-title">بيانات التوصيل</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
-                <form id="checkout-form" novalidate>
-                    @Html.AntiForgeryToken()
-                    <div class="mb-3"><label for="customer-name" class="form-label">الاسم</label><input type="text" class="form-control" id="customer-name" required></div>
-                    <div class="mb-3"><label for="customer-phone" class="form-label">الهاتف</label><input type="tel" class="form-control" id="customer-phone" required></div>
-                    <div class="mb-3"><label for="customer-address" class="form-label">العنوان</label><textarea class="form-control" id="customer-address" rows="3" required></textarea></div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-                <button type="button" id="confirm-order-btn" class="btn btn-primary">تأكيد الطلب</button>
+    <div class="modal fade" id="checkoutModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">بيانات التوصيل</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <form id="checkout-form" novalidate>
+                        @Html.AntiForgeryToken()
+                        <div class="mb-3"><label for="customer-name" class="form-label">الاسم</label><input type="text" class="form-control" id="customer-name" required></div>
+                        <div class="mb-3"><label for="customer-phone" class="form-label">الهاتف</label><input type="tel" class="form-control" id="customer-phone" required></div>
+                        <div class="mb-3"><label for="customer-address" class="form-label">العنوان</label><textarea class="form-control" id="customer-address" rows="3" required></textarea></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="button" id="confirm-order-btn" class="btn btn-primary">تأكيد الطلب</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/js/store.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/store.js" asp-append-version="true"></script>
 </body>
 </html>

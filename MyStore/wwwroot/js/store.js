@@ -1,16 +1,18 @@
 ﻿document.addEventListener('DOMContentLoaded', function () {
     // --- CONFIGURATION & STATE ---
-    const WHATSAPP_NUMBER = "201010475455"; // Your WhatsApp number
     let cart = [];
 
     // --- SELECTORS ---
     const currentStoreIdInput = document.getElementById('current-store-id');
+    const storeOwnerPhoneInput = document.getElementById('current-store-phone');
     const checkoutModalEl = document.getElementById('checkoutModal');
     const checkoutModal = checkoutModalEl ? new bootstrap.Modal(checkoutModalEl) : null;
     const productDetailsModalEl = document.getElementById('productDetailsModal');
     const productDetailsModal = productDetailsModalEl ? new bootstrap.Modal(productDetailsModalEl) : null;
+    const orderSuccessModalEl = document.getElementById('orderSuccessModal');
+    const orderSuccessModal = orderSuccessModalEl ? new bootstrap.Modal(orderSuccessModalEl) : null;
 
-    // Common Selectors for both views
+    // Common Selectors
     const allProductWrappers = document.querySelectorAll('.product-card-wrapper');
     const allCompanyButtons = document.querySelectorAll('.company-card-btn');
 
@@ -124,21 +126,28 @@
             });
             const result = await response.json();
             if (result.success) {
+                checkoutModal.hide();
+                orderSuccessModal.show();
+                let ownerPhone = storeOwnerPhoneInput.value;
+                ownerPhone = ownerPhone.replace(/^[+0\s-]+/, '').replace(/\s/g, '');
                 const totalAmount = cart.reduce((s, i) => s + i.price * i.quantity, 0);
                 let message = `*طلب جديد برقم: ${result.orderNumber}*\n\n*الاسم:* ${orderData.customerName}\n*الهاتف:* ${orderData.customerPhone}\n*العنوان:* ${orderData.customerAddress}\n\n*-- تفاصيل الطلب --*\n`;
                 cart.forEach(item => { message += `- ${item.name} (الكمية: ${item.quantity}) - ${(item.price * item.quantity).toFixed(2)} جنيه\n`; });
                 message += `\n*الإجمالي: ${totalAmount.toFixed(2)} جنيه*`;
-                window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-                cart = [];
-                updateCartDisplay();
-                checkoutModal.hide();
+                setTimeout(() => {
+                    window.location.href = `https://wa.me/${ownerPhone}?text=${encodeURIComponent(message)}`;
+                    cart = [];
+                    updateCartDisplay();
+                    orderSuccessModal.hide();
+                }, 2500);
             } else {
                 alert(`حدث خطأ: ${result.message}`);
+                confirmOrderBtn.disabled = false;
+                confirmOrderBtn.innerHTML = 'تأكيد الطلب';
             }
         } catch (error) {
             console.error("Order creation failed:", error);
             alert("فشل الاتصال بالخادم.");
-        } finally {
             confirmOrderBtn.disabled = false;
             confirmOrderBtn.innerHTML = 'تأكيد الطلب';
         }
@@ -179,9 +188,9 @@
                 if (addToCartBtn.id === 'modal-add-to-cart-btn') {
                     productDetailsModal.hide();
                 } else {
+                    const originalContent = addToCartBtn.innerHTML;
                     addToCartBtn.innerHTML = '<i class="fas fa-check"></i>';
                     setTimeout(() => {
-                        const originalContent = addToCartBtn.closest('.product-card-wrapper') ? '<i class="fas fa-cart-plus"></i>' : '<i class="fas fa-cart-plus me-1"></i> إضافة للسلة';
                         addToCartBtn.innerHTML = originalContent;
                     }, 1000);
                 }
